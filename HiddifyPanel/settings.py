@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "bot_reports.apps.BotReportsConfig",
     "sellers_finance.apps.SellersFinanceConfig",
     "sellers_reports.apps.SellersReportsConfig",
+    'servers.apps.ServersConfig',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,9 @@ ROOT_URLCONF = 'HiddifyPanel.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR / 'templates',
+                 BASE_DIR / 'accounts/templates',
+                 ]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -74,6 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'HiddifyPanel.wsgi.application'
 
+AUTH_USER_MODEL = 'accounts.User'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
