@@ -2,8 +2,7 @@ from celery import Celery
 from datetime import timedelta
 from os import environ
 
-
-environ.setdefault('DJANGO_SETTINGS_MODULE', 'NpasvBot.settings')
+environ.setdefault('DJANGO_SETTINGS_MODULE', 'HiddifyPanel.settings')
 
 celery_app = Celery('NpasvBot')
 
