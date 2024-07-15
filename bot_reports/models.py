@@ -1,3 +1,6 @@
 from django.db import models
 
-# Create your models here.
+
+class BotErrorLog(models.Model):
+    error = models.TextField()
+    timestamp = models.IntegerField()

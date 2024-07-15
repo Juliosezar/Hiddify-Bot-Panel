@@ -49,9 +49,18 @@ class RegisterView(LoginRequiredMixin, View):
 
 
 class HomeBotView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            if request.user.level_access != 10:
+                return redirect("accounts:home_sellers")
+        else:
+            return redirect("accounts:login")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         return render(request, "home_bot.html")
 
+
 class HomeSellersView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "")
+        return render(request, "home_sellers.html")

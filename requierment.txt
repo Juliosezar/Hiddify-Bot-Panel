@@ -44,6 +44,7 @@ mdurl==0.1.2
 multidict==6.0.5
 openai==1.30.5
 packaging==24.0
+persiantools==4.2.0
 pillow==10.3.0
 prompt_toolkit==3.0.45
 pycparser==2.22
@@ -53,10 +54,12 @@ Pygments==2.18.0
 pyinstaller==6.7.0
 pyinstaller-hooks-contrib==2024.6
 PyMySQL==1.1.1
+pypng==0.20220715.0
 python-crontab==3.1.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
+qrcode==7.4.2
 rcssmin==1.1.1
 regex==2024.5.15
 requests==2.32.2
