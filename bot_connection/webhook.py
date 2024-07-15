@@ -9,32 +9,30 @@ from utils import now_timestamp
 
 COMMANDS = {
     '/start': CommandRunner.main_menu,
-    # 'خرید سرویس 🛍': CommandRunner.select_server,
-    # 'back_to_servers': CommandRunner.back_to_select_server,
-    # 'کیف پول 💰': CommandRunner.show_wallet_status,
+    'خرید سرویس 🛍': CommandRunner.select_config_expire_time,
+    'کیف پول 💰': CommandRunner.show_wallet_status,
     # 'تست رایگان 🔥': CommandRunner.test_conf,
     # 'سرویس های من 🧑‍💻': CommandRunner.my_services,
-    # 'تعرفه ها 💳': CommandRunner.send_prices,
-    # 'ارتباط با ادمین 👤': CommandRunner.contact_us,
-    # 'آیدی من 🆔': CommandRunner.myid,
-    # 'down_guid_app': CommandRunner.down_guid_app,
-    # '💻📱 دانلود اپلیکیشن و راهنمای اتصال 💡': CommandRunner.download_apps,
-    # "send_guid":CommandRunner.send_guid,
-    # 'add_to_wallet': CommandRunner.set_pay_amount,
-    # 'set_pay_amount': CommandRunner.send_pay_card_info,
+    'تعرفه ها 💳': CommandRunner.send_prices,
+    'ارتباط با ادمین 👤': CommandRunner.contact_us,
+    'آیدی من 🆔': CommandRunner.myid,
+    'down_guid_app': CommandRunner.down_guid_app,
+    '💻📱 دانلود اپلیکیشن و راهنمای اتصال 💡': CommandRunner.download_apps,
+    "send_guid":CommandRunner.send_guid,
+    'add_to_wallet': CommandRunner.set_pay_amount,
+    'set_pay_amount': CommandRunner.send_pay_card_info,
     '❌ لغو پرداخت 💳': CommandRunner.abort,
-    # 'server_buy': CommandRunner.select_config_expire_time,
-    # 'expire_time': CommandRunner.select_config_usage,
-    # 'usage_limit': CommandRunner.confirm_config_buying,
-    # 'pay_for_config': CommandRunner.pay_for_config,
+    'expire_time': CommandRunner.select_config_usage,
+    'usage_limit': CommandRunner.confirm_config_buying,
+    'pay_for_config': CommandRunner.pay_for_config,
     # 'buy_config_from_wallet': CommandRunner.buy_config_from_wallet,
-    # 'abort_buying': CommandRunner.abort_buying,
+    'abort_buying': CommandRunner.abort_buying,
     # 'service_status': CommandRunner.get_service,
     # 'tamdid': CommandRunner.tamdid_select_config_expire_time,
-    # 'tamdid_expire_time': CommandRunner.tamdid_select_config_usage,
-    # 'tam_usage': CommandRunner.tamdid_confirm_config_buying,
+    'tamdid_expire_time': CommandRunner.tamdid_select_config_usage,
+    'tam_usage': CommandRunner.tamdid_confirm_config_buying,
     # 'tam_wallet': CommandRunner.tamdid_config_from_wallet,
-    # "tam_pay": CommandRunner.tamdid_pay_for_config,
+    "tam_pay": CommandRunner.tamdid_pay_for_config,
     # "choose_location": CommandRunner.choose_location,
     # "change_location": CommandRunner.change_location,
     # "confirm_change": CommandRunner.confirm_change,
@@ -55,9 +53,9 @@ def webhook(request):
             update = json.loads(request.body)
             if 'message' in update:
                 chat_id = update['message']['chat']['id']
-                if not CustumerModel.objects.filter(userid=chat_id).exists():
+                if not CustumerModel.objects.filter(chat_id=chat_id).exists():
                     CommandRunner.main_menu(chat_id)
-                if not CustumerModel.objects.get(userid=chat_id).active:
+                if CustumerModel.objects.get(chat_id=chat_id).banned:
                     CommandRunner.send_msg_to_user(chat_id, "🚫 دسترسی شما به بات توسط ادمین لغو شده است.")
                     return JsonResponse({'status': 'ok'})
                 if "text" in update["message"]:
@@ -69,13 +67,13 @@ def webhook(request):
                             COMMANDS[command](chat_id, args)
                         else:
                             COMMANDS[command](chat_id)
-                    # elif CustumerModel.objects.get(userid=chat_id).temp_status == "set_pay_amount":
-                    #     CommandRunner.send_pay_card_info(chat_id, text)
-                    elif CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture":
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "set_pay_amount":
+                        CommandRunner.send_pay_card_info(chat_id, text)
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture":
                         CommandRunner.send_msg_to_user(chat_id, "لطفا عکس پرداختی خود را ارسال نمایید :")
-                    elif CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture_for_config":
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture_for_config":
                         CommandRunner.send_msg_to_user(chat_id, "لطفا عکس پرداختی خود را ارسال نمایید :")
-                    elif CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture_for_tamdid":
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture_for_tamdid":
                         CommandRunner.send_msg_to_user(chat_id, "لطفا عکس پرداختی خود را ارسال نمایید :")
                     # elif "/start register_" in text:
                     #     CommandRunner.register_config(chat_id, text.replace("/start register_", ""))
@@ -86,19 +84,19 @@ def webhook(request):
                         CommandRunner.main_menu(chat_id)
 
                 elif "photo" in update["message"]:
-                    if CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture":
+                    if CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture":
                         photo = (update["message"]["photo"][-1])
                         file_id = photo["file_id"]
                         CommandRunner.download_photo(file_id, chat_id, False)
                         CommandRunner.send_msg_to_user(chat_id, "✅ تصویر شما دریافت شد.\n منتظر تایید پرداخت توسط همکاران ما باشید.\nپس از تایید مبلغ مورد نظر به کیف پولتان اضافه خواهد شد." "\n\n" "⭕️ لطفا از ارسال دوباره ی پرداخت خود، اکیدا خودداری کنید.")
 
-                    elif CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture_for_config":
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture_for_config":
                         photo = (update["message"]["photo"][-1])
                         file_id = photo["file_id"]
                         CommandRunner.download_photo(file_id, chat_id, True)
                         CommandRunner.send_msg_to_user(chat_id, "✅ تصویر شما دریافت شد.\n منتظر تایید پرداخت توسط همکاران ما باشید.\nپس از تایید کانفیگ شما به صورت خودکار برایتان ارسال میگردد." "\n\n" "⭕️ لطفا از ارسال دوباره ی پرداخت خود، اکیدا خودداری کنید.")
 
-                    elif CustumerModel.objects.get(userid=chat_id).temp_status == "get_paid_picture_for_tamdid":
+                    elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture_for_tamdid":
                         photo = (update["message"]["photo"][-1])
                         file_id = photo["file_id"]
                         CommandRunner.download_photo(file_id, chat_id, True, True)
@@ -113,9 +111,9 @@ def webhook(request):
                 msg_id = update["callback_query"]["message"]["message_id"]
                 query_data = update['callback_query']['data']
                 chat_id = update['callback_query']['message']['chat']['id']
-                if not CustumerModel.objects.filter(userid=chat_id).exists():
+                if not CustumerModel.objects.filter(chat_id=chat_id).exists():
                     CommandRunner.main_menu(chat_id)
-                if not CustumerModel.objects.get(userid=chat_id).active:
+                if CustumerModel.objects.get(chat_id=chat_id).banned:
                     CommandRunner.send_msg_to_user(chat_id, "🚫 دسترسی شما به بات توسط ادمین لغو شده است.")
                     return JsonResponse({'status': 'ok'})
                 if query_data.split("<~>")[0] in COMMANDS.keys():

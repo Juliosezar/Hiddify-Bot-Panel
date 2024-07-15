@@ -7,9 +7,7 @@ class HiddifyApi:
     @classmethod
     def create_config(cls, server_obj, partition, name, usage_limit, days_limit, comment=None):
         partition_dic = {
-            "sellers_single": server_obj.sellers_single_uuid,
             "sellers_sub": server_obj.sellers_sub_uuid,
-            "bot_single": server_obj.bot_single_uuid,
             "bot_sub": server_obj.bot_sub_uuid,
         }
         partition_uuid = str(partition_dic[partition])
