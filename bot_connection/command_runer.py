@@ -8,30 +8,15 @@ from django.core.files.base import ContentFile
 import json
 import requests
 import qrcode
-from utils import now_timestamp, is_valid_uuid
 from bot_customers.models import Customer
 from bot_customers.actions import CustomerAction
 from bot_finance.actions import FinanceAction
 from bot_finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue, CreateConfigQueue, TamdidConfigQueue, \
     Prices, UserActiveOffCodes, OffCodes
 from bot_finance.actions import FinanceAction
-from utils import args_spliter, now_timestamp
+from utils import args_spliter, now_timestamp, is_valid_uuid
 from servers.models import BotConfigInfo
 import traceback
-
-# from finance.views import Wallet
-# from custumers.views import Customer
-# from custumers.models import Customer as CustumerModel
-# from servers.models import Server as ServerModel, CreateConfigQueue, ConfigsInfo, TamdidConfigQueue, TestConfig
-# from finance.models import OffCodes, UserActiveOffCodes
-# from finance.views import Prices
-# from finance.models import Prices as PricesModel
-# from finance.models import ConfirmPaymentQueue as ConfirmPaymentQueueModel
-# from finance.models import ConfirmTamdidPaymentQueue as TamdidConfirmPaymentQueueModel
-# from finance.views import Paying
-# from servers.views import ServerApi
-# from servers.views import Configs
-
 
 
 class CommandRunner:

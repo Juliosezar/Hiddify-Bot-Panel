@@ -75,11 +75,11 @@ class FinanceAction:
         user_obj = Customer.objects.get(chat_id=chat_id)
         if CreateConfigQueue.objects.filter(custumer=user_obj, pay_status=0).exists():
             CreateConfigQueue.objects.get(custumer=user_obj, pay_status=0).delete()
-
+        config_name = generate_unique_name()
         CreateConfigQueue.objects.create(
             custumer=user_obj,
             config_uuid=config_uuid,
-            config_name=generate_unique_name(),
+            config_name=config_name,
             usage_limit=usage_limit,
             expire_time=expire_time,
             user_limit=user_limit,

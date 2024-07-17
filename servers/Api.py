@@ -1,11 +1,12 @@
 import requests
 import uuid
 from .models import Server
-
+from utils import now_date
 
 class HiddifyApi:
     @classmethod
-    def create_config(cls, server_obj, partition, name, usage_limit, days_limit, comment=None):
+    def create_config(cls, server_obj, config_obj, partition, comment=None):
+        print("api")
         partition_dic = {
             "sellers_sub": server_obj.sellers_sub_uuid,
             "bot_sub": server_obj.bot_sub_uuid,
@@ -19,7 +20,10 @@ class HiddifyApi:
             "Accept": "application/json",
             'Hiddify-API-Key': str(server_obj.admin_uuid)
         }
-
+        if config_obj.days_limit == 0:
+            days_limit = 5000
+        else:
+            days_limit = config_obj.days_limit
         payload = {
             "added_by_uuid": partition_uuid,
             "comment": comment,
@@ -27,18 +31,20 @@ class HiddifyApi:
             "enable": True,
             "is_active": True,
             "lang": "en",
-            # "last_reset_time": null,
+            # "last_reset_time": now_date(),
             "mode": "no_reset",
-            "name": name,
-            "package_days": days_limit,
-            "start_date": "2019-08-24",
+            "name": config_obj.name,
+            "package_days": 10000,
+            "start_date": now_date(),
             "telegram_id": 0,
-            "usage_limit_GB": usage_limit,
+            "usage_limit_GB": 10000,
             "uuid": str(uuid.uuid4()),
         }
         try:
             response = requests.post(url, headers=headers, json=payload)
             print(response.json())
             print(response.status_code)
+            return True
         except Exception as e:
             print(e)
+            return False

@@ -1,0 +1,9 @@
+
+#id_active , #id_old_iphone {
+    width: 1rem;
+    height: 1rem;
+}
+
+
+
+@media (max-width: 650px) {}

@@ -19,30 +19,34 @@ class Server(models.Model):
 
 
 class BotConfigInfo(models.Model):
-    server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    name = models.CharField(max_length=40, null=False)
-    uuid = models.UUIDField(null=False)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name.join(f" / {self.server.name}")
-
-
-class BotSubscriptionInfo(models.Model):
     name = models.CharField(max_length=40, null=False)
     uuid = models.UUIDField(null=False, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    price = models.PositiveIntegerField(default=0)
+    paid = models.BooleanField(default=True)
+    created_by = models.CharField(max_length=20, default="BOT")
+    renew_count = models.IntegerField(default=0)
+    usage_limit = models.IntegerField(default=0)
+    endtime_timestamp = models.PositiveIntegerField(null=True)
+    user_limit = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.name
 
 
-class BotSubConfigsCreateStatus(models.Model):
+class BotInfinitCongisLimit(models.Model):
+    config = models.OneToOneField(BotConfigInfo, on_delete=models.CASCADE)
+    limit = models.IntegerField()
+
+
+class BotEveryServer(models.Model):
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    subscription = models.ForeignKey(BotSubscriptionInfo, on_delete=models.CASCADE)
-    status = models.IntegerField(default=0, choices=[(0, "in queue"), (1, "pending server"), (2, "done"), (-1, "error")])
-    update_timestamp = models.PositiveIntegerField(default=0)
+    config = models.ForeignKey(BotConfigInfo, on_delete=models.CASCADE)
+    usage_now = models.PositiveIntegerField(null=True)
+    days_now = models.PositiveIntegerField(null=True)
+    update_timestamp = models.PositiveIntegerField(null=True)
 
     def __str__(self):
-        return self.subscription.name.join(f" / {self.server.name}")
+        return self.server.name + self.config.name
+
 

@@ -18,7 +18,7 @@ COMMANDS = {
     'آیدی من 🆔': CommandRunner.myid,
     'down_guid_app': CommandRunner.down_guid_app,
     '💻📱 دانلود اپلیکیشن و راهنمای اتصال 💡': CommandRunner.download_apps,
-    "send_guid":CommandRunner.send_guid,
+    "send_guid": CommandRunner.send_guid,
     'add_to_wallet': CommandRunner.set_pay_amount,
     'set_pay_amount': CommandRunner.send_pay_card_info,
     '❌ لغو پرداخت 💳': CommandRunner.abort,
