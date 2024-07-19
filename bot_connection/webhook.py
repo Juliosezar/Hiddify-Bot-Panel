@@ -25,7 +25,7 @@ COMMANDS = {
     'expire_time': CommandRunner.select_config_usage,
     'usage_limit': CommandRunner.confirm_config_buying,
     'pay_for_config': CommandRunner.pay_for_config,
-    # 'buy_config_from_wallet': CommandRunner.buy_config_from_wallet,
+    'buy_config_from_wallet': CommandRunner.buy_config_from_wallet,
     'abort_buying': CommandRunner.abort_buying,
     # 'service_status': CommandRunner.get_service,
     # 'tamdid': CommandRunner.tamdid_select_config_expire_time,
@@ -75,10 +75,10 @@ def webhook(request):
                         CommandRunner.send_msg_to_user(chat_id, "لطفا عکس پرداختی خود را ارسال نمایید :")
                     elif CustumerModel.objects.get(chat_id=chat_id).temp_status == "get_paid_picture_for_tamdid":
                         CommandRunner.send_msg_to_user(chat_id, "لطفا عکس پرداختی خود را ارسال نمایید :")
-                    # elif "/start register_" in text:
-                    #     CommandRunner.register_config(chat_id, text.replace("/start register_", ""))
-                    # elif "/start off_code_" in text:
-                    #     CommandRunner.active_off_code(chat_id, text.replace("/start off_code_", ""))
+                    elif "/start register_" in text:
+                        CommandRunner.register_config(chat_id, text.replace("/start register_", ""))
+                    elif "/start off_code_" in text:
+                        CommandRunner.active_off_code(chat_id, text.replace("/start off_code_", ""))
                     else:
                         CommandRunner.send_msg_to_user(chat_id, "ورودی نامعتبر")
                         CommandRunner.main_menu(chat_id)

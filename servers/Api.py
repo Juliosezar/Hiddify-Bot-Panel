@@ -1,7 +1,7 @@
 import requests
 import uuid
 from .models import Server
-from utils import now_date
+from utils import now_date, now_timestamp
 
 class HiddifyApi:
     @classmethod
@@ -20,10 +20,7 @@ class HiddifyApi:
             "Accept": "application/json",
             'Hiddify-API-Key': str(server_obj.admin_uuid)
         }
-        if config_obj.days_limit == 0:
-            days_limit = 5000
-        else:
-            days_limit = config_obj.days_limit
+
         payload = {
             "added_by_uuid": partition_uuid,
             "comment": comment,
@@ -42,9 +39,13 @@ class HiddifyApi:
         }
         try:
             response = requests.post(url, headers=headers, json=payload)
-            print(response.json())
-            print(response.status_code)
-            return True
+            if response.status_code == 200:
+                print(response.json())
+                print(response.status_code)
+                return True
+            else:
+                print(response.status_code)
+                return False
         except Exception as e:
             print(e)
             return False

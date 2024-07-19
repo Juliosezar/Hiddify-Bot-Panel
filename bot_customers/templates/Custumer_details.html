@@ -1,0 +1,116 @@
+{% load compress %}
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include "base_head.html" %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'component.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'bot_customers/custumer_details.css' %}">
+    <script>
+        $(document).ready(function() {
+            $("#loading").hide()
+            $(".item").click(function () {
+                $("#main").hide();
+                $("#loading").show();
+            });
+        });
+    </script>
+</head>
+<body>
+    {% include "navbar.html" %}
+    {% if messages %}
+        <div class="message-container" dir="rtl">
+            {% for msg in messages %}
+                <h2 class="msg msg_{{ msg.tags }}">{{ msg }}</h2>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div id="main">
+        <h3 id="title">User Info: {{ customer_obj.userid }}</h3>
+            {% if customer_obj.banned %}
+                <h3 dir="rtl" style="color: #0a0000" class="banned">⛔️ یوزر توسط ادمین بن شده است. ⛔️</h3>
+            {% endif %}
+        <div class="infobox" dir="rtl">
+            {% if customer_obj.username == none %}
+                <h3 class="info_item"> یوزرنیم : ----</h3>
+            {% else %}
+                <h3 class="info_item"> یوزرنیم : {{ customer_obj.username }}@</h3>
+            {% endif %}
+            <h3 class="info_item">نام : {{ customer_obj.first_name }}</h3>
+            <h3 class="info_item">موجودی کیف پول : {{ customer_obj.wallet|price }} T  <a href="{% url "bot_customers:change_wallet" customer_obj.chat_id %}"><img style="width: 2rem" src="{% static 'img/edit.png' %}" alt=""></a></h3>
+            <h3 class="info_item">تعداد خرید ها : {{ customer_obj.purchase_number }}</h3>
+            <h3 class="info_item">مجموع پرداخت ها : {{ sum_pays|price }} T</h3>
+            {% if customer_obj.banned %}
+                <h3 class="info_item">وضعیت : غیرفعال 🔴</h3>
+            {% else %}
+                <h3 class="info_item">وضعیت : فعال 🟢</h3>
+            {% endif %}
+        <div id="btnaction">
+            <a class="imgc" href="{% url 'bot_customers:send_msg_to_user' customer_obj.chat_id %}"><img src="{% static "img/sendmsg.png" %}"></a>
+            <a class="imgc" href="{% url "bot_customers:update_customer" customer_obj.chat_id %}"><img src="{% static 'img/icons8-restart-512.png' %}" alt=""></a>
+            {% if customer_obj.banned %}
+                <a class="ban imgc" href="{% url "bot_customers:ban_user" customer_obj.chat_id %}"><img src="{% static "img/unban.png" %}" alt=""></a>
+            {% else %}
+                <a class="ban imgc" href="{% url "bot_customers:ban_user" customer_obj.chat_id %}"><img src="{% static "img/ban.png" %}" alt=""></a>
+            {% endif %}
+        </div>
+        </div>
+        {% if not sum_configs %}
+            <h3 id="title">🔻 کانفیگی ثبت نشده است 🔻</h3>
+        {% else %}
+            <h3 id="title">لیست کانفیگ ها</h3>
+            <div class="configs_list">
+                {% for conf in configs_model %}
+                    <div class="configbox">
+                        <a href="{% url 'bot_config:config_page' conf.uuid %}" class="conf_name">{{ conf.name }}</a>
+                        <h6 class="usage conf_infos" id="usage">&#128259; {{ conf.uuid|bot_add_usages }} GB / {% if conf.usage_limit == 0 %}&infin;{% else %}{{ conf.usage_limit }} GB{% endif %}</h6>
+                        {% if conf.days_limit == 0 %}
+                            <h6 class="time conf_infos" id="time">⏳  زمان نامحدود ∞</h6>
+                        {% else %}
+                            <h6 class="time conf_infos" id="time">⏳ {{ conf.days_limit|remain_days:conf.start_timestamp }}</h6>
+                        {% endif %}
+                        {% if not conf.start_timestamp %}
+                            <h6 class="status conf_infos" id="status">استارت نخورده 🔵</h6>
+                        {% elif conf.uuid|bot_add_usages > conf.usage_limit and conf.usage_limit != 0 or conf.days_limit|expired:conf.start_timestamp %}
+                            <h6 class="status conf_infos" id="status">تمام شده 🔴</h6>
+                        {% else %}
+                            <h6 class="status conf_infos" id="status">🟢 فعال</h6>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <hr style="background-color: #0a0000">
+                <h4 id="his">History</h4>
+            <div class="xcontainer">
+		    		<table class="overflow-y">
+		    			<thead>
+		    				<tr>
+                                <th>Data/Time</th>
+                                <th>َAction</th>
+		    				</tr>
+		    			</thead>
+		    			<tbody>
+                        {% for x in history %}
+                            <tr>
+                                <td>
+                                    {{ x.timestamp|timestamp }}
+                                </td>
+                                <td dir="ltr">
+                                    {{ x.action }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+		    			</tbody>
+		    		</table>
+            </div>
+
+    </div>
+{% include "loading.html" %}
+{% include "list_servers.html" %}
+
+</body>
+</html>

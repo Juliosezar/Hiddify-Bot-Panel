@@ -13,40 +13,10 @@ class Server(models.Model):
     bot_sub_uuid = models.UUIDField(null=True)
     active = models.BooleanField(default=True)
     old_iphone = models.BooleanField(default=False)
+    last_update = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
 
-
-class BotConfigInfo(models.Model):
-    name = models.CharField(max_length=40, null=False)
-    uuid = models.UUIDField(null=False, unique=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    price = models.PositiveIntegerField(default=0)
-    paid = models.BooleanField(default=True)
-    created_by = models.CharField(max_length=20, default="BOT")
-    renew_count = models.IntegerField(default=0)
-    usage_limit = models.IntegerField(default=0)
-    endtime_timestamp = models.PositiveIntegerField(null=True)
-    user_limit = models.PositiveIntegerField(null=True)
-
-    def __str__(self):
-        return self.name
-
-
-class BotInfinitCongisLimit(models.Model):
-    config = models.OneToOneField(BotConfigInfo, on_delete=models.CASCADE)
-    limit = models.IntegerField()
-
-
-class BotEveryServer(models.Model):
-    server = models.ForeignKey(Server, on_delete=models.CASCADE)
-    config = models.ForeignKey(BotConfigInfo, on_delete=models.CASCADE)
-    usage_now = models.PositiveIntegerField(null=True)
-    days_now = models.PositiveIntegerField(null=True)
-    update_timestamp = models.PositiveIntegerField(null=True)
-
-    def __str__(self):
-        return self.server.name + self.config.name
 
 

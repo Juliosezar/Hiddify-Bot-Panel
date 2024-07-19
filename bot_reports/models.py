@@ -1,5 +1,6 @@
 from django.db import models
-from servers.models import BotConfigInfo, Customer
+from bot_config.models import BotConfigInfo
+from bot_customers.models import Customer
 
 
 class BotErrorLog(models.Model):

@@ -60,3 +60,5 @@ class EditServer(LoginRequiredMixin, View):
             obj.save()
             return redirect('servers:show_servers')
         return render(request, "add_server.html", {'form': form, "edit": True})
+
+

@@ -1,15 +1,16 @@
 from os import environ
-
 from django.shortcuts import render, redirect
-from .models import Prices, ConfirmPaymentQueue, ConfirmTamdidPaymentQueue, BotConfigInfo, OffCodes, UserActiveOffCodes
+from .models import Prices, ConfirmPaymentQueue, ConfirmTamdidPaymentQueue, BotConfigInfo, OffCodes
 from .actions import FinanceAction
 from django.views import View
 from .forms import DenyForm,AddPriceForm,AddOffForm,EditPriceForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from bot_customers.models import Customer
 from django.contrib import messages
-from servers.bot_actions import BotAction
+from bot_config.actions import BotAction
 from utils import now_timestamp
+
+
 
 
 class ConfirmPaymentPage(LoginRequiredMixin, View):
@@ -43,7 +44,6 @@ class FirstConfirmPayment(LoginRequiredMixin, View):
                     CommandRunner.send_msg_to_user(model_obj.custumer.chat_id,
                                                    f'کابر گرامی مبلغ {model_obj.pay_price} تومان به کیف پول شما اضافه گردید. این مبلغ برای خرید کانفیک مورد نظر کافی نیست. ')
             else:
-                FinanceAction.add_to_wallet(model_obj.custumer.chat_id, model_obj.pay_price)
                 msg = 'پرداخت شما تایید و به کیف پول شما اضافه شد.'
                 CommandRunner.send_msg_to_user(model_obj.custumer.chat_id, msg)
             model_obj.status = 2
@@ -63,12 +63,12 @@ class SecondConfirmPayment(LoginRequiredMixin, View):
             FinanceAction.add_to_wallet(model_obj.custumer.chat_id, model_obj.pay_price)
             if model_obj.config_in_queue:
                 if Customer.objects.get(chat_id=model_obj.custumer.chat_id).wallet >= model_obj.config_price:
+                    CommandRunner.send_msg_to_user(model_obj.custumer.chat_id, "پرداخت شما تایید شد. ✅")
                     BotAction.create_config_from_queue(config_uuid=model_obj.config_uuid)
                 else:
                     CommandRunner.send_msg_to_user(model_obj.custumer.chat_id,
                                                    f'کابر گرامی مبلغ {model_obj.pay_price} تومان به کیف پول شما اضافه گردید. این مبلغ برای خرید کانفیک مورد نظر کافی نیست. ')
             else:
-                FinanceAction.add_to_wallet(model_obj.custumer.chat_id, model_obj.pay_price)
                 msg = 'پرداخت شما تایید و به کیف پول شما اضافه شد.'
                 CommandRunner.send_msg_to_user(model_obj.custumer.chat_id, msg)
             model_obj.status = 3
@@ -391,3 +391,4 @@ class DeleteOffCode(LoginRequiredMixin, View):
     def get(self, request, uuid):
         OffCodes.objects.get(uid=uuid).delete()
         return redirect("bot_finance:show_off_codes")
+

@@ -1,6 +1,7 @@
 from celery import shared_task
-from .Api import HiddifyApi
-from .models import Server, BotEveryServer, BotConfigInfo
+from servers.Api import HiddifyApi
+from servers.models import Server
+from bot_config.models import BotConfigsEveryServerUsage, BotConfigInfo
 from utils import now_timestamp
 
 @shared_task

@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "sellers_finance.apps.SellersFinanceConfig",
     "sellers_reports.apps.SellersReportsConfig",
     'servers.apps.ServersConfig',
+    'bot_config.apps.BotConfigConfig',
+    'sellers_config.apps.SellersConfigConfig'
 ]
 
 MIDDLEWARE = [

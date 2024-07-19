@@ -1,6 +1,6 @@
 from bot_customers.models import Customer
 from .models import Prices, ConfirmPaymentQueue, ConfirmTamdidPaymentQueue
-from servers.models import BotConfigInfo
+from bot_config.models import BotConfigInfo
 from bot_finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue, TamdidConfigQueue, CreateConfigQueue
 from bot_finance.models import Customer
 from .models import BotConfigInfo

@@ -5,7 +5,7 @@ import uuid
 
 from django.db import models
 from bot_customers.models import Customer
-from servers.models import BotConfigInfo
+from bot_config.models import BotConfigInfo
 
 
 class ConfirmPaymentQueue(models.Model):

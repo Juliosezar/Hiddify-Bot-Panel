@@ -13,5 +13,6 @@ urlpatterns = [
     path("bot_finance/", include("bot_finance.urls", namespace="bot_finance")),
     path("bot_customers/", include("bot_customers.urls", namespace="bot_customers")),
     path("servers/", include("servers.urls", namespace="servers")),
+    path("bot_config/", include("bot_config.urls", namespace="bot_configs")),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

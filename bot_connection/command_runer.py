@@ -1,5 +1,5 @@
-import traceback
 from os import environ
+import qrcode
 from .models import SendMessage
 from bot_reports.models import BotErrorLog
 from django.conf import settings
@@ -7,16 +7,15 @@ from uuid import uuid4
 from django.core.files.base import ContentFile
 import json
 import requests
-import qrcode
 from bot_customers.models import Customer
 from bot_customers.actions import CustomerAction
-from bot_finance.actions import FinanceAction
 from bot_finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue, CreateConfigQueue, TamdidConfigQueue, \
     Prices, UserActiveOffCodes, OffCodes
 from bot_finance.actions import FinanceAction
 from utils import args_spliter, now_timestamp, is_valid_uuid
-from servers.models import BotConfigInfo
+from bot_config.models import BotConfigInfo
 import traceback
+from bot_config.actions import BotAction, Tools
 
 
 class CommandRunner:
@@ -396,12 +395,13 @@ class CommandRunner:
         data2 = {
             'chat_id': chat_id,
             "text": "تصویر پرداختی خود را ارسال کنید :",
-            'resize_keyboard': True,
-            'one_time_keyboard': True,
             'reply_markup': {
+                'resize_keyboard': True,
+                'one_time_keyboard': True,
                 'keyboard': [
                     [{'text': '❌ لغو پرداخت 💳'}]]
             },
+
         }
         CustomerAction.change_custimer_temp_status(chat_id, "get_paid_picture_for_config")
         uu_id = uuid4()
@@ -412,50 +412,41 @@ class CommandRunner:
         cls.send_api("sendMessage", data2)
         cls.send_api("editMessageText", data)
 
-    # @classmethod
-    # def buy_config_from_wallet(cls, chat_id, *args):
-    #     msg_id = int(args[0])
-    #     arg_splited = args_spliter(args[1])
-    #     server_id = arg_splited[0]
-    #     expire_limit = int(arg_splited[1])
-    #     usage_limit = int(arg_splited[2])
-    #     user_limit = int(arg_splited[3])
-    #     price = PricesModel.objects.get(usage_limit=usage_limit, expire_limit=expire_limit, user_limit=user_limit).price
-    #     have_off_code = False
-    #     if usage_limit != 0 and expire_limit != 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id,
-    #                                                                                     used=False,
-    #                                                                                     off_code__for_not_infinity=True).exists():
-    #         have_off_code = True
-    #     elif usage_limit == 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id, used=False,
-    #                                                                 off_code__for_infinit_usages=True).exists():
-    #         have_off_code = True
-    #     elif expire_limit == 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id, used=False,
-    #                                                                  off_code__for_infinit_times=True).exists():
-    #         have_off_code = True
-    #     if have_off_code:
-    #         off_model = UserActiveOffCodes.objects.get(custumer__chat_id=chat_id, used=False)
-    #         if off_model.off_code.type_off:
-    #             price = price - int(off_model.off_code.amount * price / 100)
-    #         else:
-    #             price = price - (off_model.off_code.amount * 1000)
-    #     create_config = Configs.create_config_from_wallet(chat_id, server_id, expire_limit, usage_limit, user_limit, price)
-    #     if create_config:
-    #         data = {
-    #             'message_id': msg_id,
-    #             'chat_id': chat_id,
-    #             'text': f"کانفیک شما ارسال شد و مبلغ {price} تومان از کیف پول شما کسر شد.",
-    #             'parse_mode': 'Markdown',
-    #         }
-    #         cls.send_api("editMessageText", data)
-    #     else:
-    #         msg = f'اتصال به سرور {ServerModel.objects.get(server_id=server_id).server_name} برقرار نشد.' '\n میتوانید کشور مورد نظر را تغییر دهید یا دقایقی دیگر دوباره امتحان کنید.'
-    #         data = {
-    #             'message_id': msg_id,
-    #             'chat_id': chat_id,
-    #             'text': msg,
-    #             'parse_mode': 'Markdown',
-    #         }
-    #         cls.send_api("editMessageText", data)
+    @classmethod
+    def buy_config_from_wallet(cls, chat_id, *args):
+        msg_id = int(args[0])
+        arg_splited = args_spliter(args[1])
+        expire_limit = int(arg_splited[0])
+        usage_limit = int(arg_splited[1])
+        user_limit = int(arg_splited[2])
+        price = Prices.objects.get(usage_limit=usage_limit, expire_limit=expire_limit, user_limit=user_limit).price
+        have_off_code = False
+        if usage_limit != 0 and expire_limit != 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id,
+                                                                                        used=False,
+                                                                                        off_code__for_not_infinity=True).exists():
+            have_off_code = True
+        elif usage_limit == 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id, used=False,
+                                                                    off_code__for_infinit_usages=True).exists():
+            have_off_code = True
+        elif expire_limit == 0 and UserActiveOffCodes.objects.filter(custumer__chat_id=chat_id, used=False,
+                                                                     off_code__for_infinit_times=True).exists():
+            have_off_code = True
+        if have_off_code:
+            off_model = UserActiveOffCodes.objects.get(custumer__chat_id=chat_id, used=False)
+            if off_model.off_code.type_off:
+                price = price - int(off_model.off_code.amount * price / 100)
+            else:
+                price = price - (off_model.off_code.amount * 1000)
+        create_config = BotAction.create_config_from_wallet(chat_id, expire_limit, usage_limit, user_limit, price)
+        if create_config:
+            data = {
+                'message_id': msg_id,
+                'chat_id': chat_id,
+                'text': f"کانفیک شما ارسال شد و مبلغ {price} تومان از کیف پول شما کسر شد.",
+                'parse_mode': 'Markdown',
+            }
+            cls.send_api("editMessageText", data)
+
 
     @classmethod
     def abort_buying(cls, chat_id, *args):
@@ -469,55 +460,55 @@ class CommandRunner:
         cls.send_api("editMessageText", data)
         cls.main_menu(chat_id)
 
-    # @classmethod
-    # def register_config(cls, chat_id, msg):
-    #     if is_valid_uuid(msg):
-    #         if ConfigsInfo.objects.filter(config_uuid=msg).exists():
-    #             custumer = CustumerModel.objects.get(chat_id=chat_id)
-    #             obj = ConfigsInfo.objects.get(config_uuid=msg)
-    #             obj.chat_id = custumer
-    #             obj.save()
-    #             vless = Configs.create_vless_text(msg, obj.server, obj.config_name)
-    #             cls.send_msg_to_user(chat_id, "🟢 کانفیگ شما ثبت شد.")
-    #             data = {
-    #                 'chat_id': chat_id,
-    #                 'text': vless,
-    #                 'parse_mode': 'Markdown',
-    #                 'reply_markup': {
-    #                     'inline_keyboard': [[{'text': 'دریافت QRcode',
-    #                                           'callback_data': f'QRcode<~>{msg}'}],
-    #                                         ]
-    #
-    #                 },
-    #             }
-    #             cls.send_api("sendMessage", data)
-    #         else:
-    #             cls.send_msg_to_user(chat_id, "کانفیگی با این مشخصات ثبت نشده است.")
-    #     else:
-    #         cls.send_msg_to_user(chat_id, 'لینک نامعتبر است.')
+    @classmethod
+    def register_config(cls, chat_id, conf_uuid):
+        if is_valid_uuid(conf_uuid):
+            if BotConfigInfo.objects.filter(uuid=conf_uuid).exists():
+                custumer = Customer.objects.get(chat_id=chat_id)
+                obj = BotConfigInfo.objects.get(uuid=conf_uuid)
+                obj.chat_id = custumer
+                obj.save()
+                vless = Tools.create_vless_text(conf_uuid, obj.name)
+                cls.send_msg_to_user(chat_id, "🟢 کانفیگ شما ثبت شد.")
+                data = {
+                    'chat_id': chat_id,
+                    'text': vless,
+                    'parse_mode': 'Markdown',
+                    'reply_markup': {
+                        'inline_keyboard': [[{'text': 'دریافت QRcode',
+                                              'callback_data': f'QRcode<~>{conf_uuid}'}],
+                                            ]
 
-    # @classmethod
-    # def Qrcode(cls, chat_id, *args):
-    #     conf_uuid = args[1]
-    #     if ConfigsInfo.objects.filter(config_uuid=conf_uuid).exists():
-    #         obj = ConfigsInfo.objects.get(config_uuid=conf_uuid)
-    #         vless = (f"vless://{obj.config_uuid}@{obj.server.server_fake_domain}:{obj.server.inbound_port}?"
-    #                  f"security=none&encryption=none&host=speedtest.net&headerType=http&type=tcp#{obj.config_name}"
-    #                  )
-    #         qr = qrcode.QRCode(version=3, box_size=30, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
-    #         qr.add_data(vless)
-    #         qr.make(fit=True)
-    #         img = qr.make_image(fill_color="black", back_color="white")
-    #         filename = conf_uuid
-    #         img.save(str(settings.MEDIA_ROOT) + f"/{filename}.jpg")
-    #         data = {'chat_id': chat_id,
-    #                 'photo': f"https://admin-napsv.ir/media/{filename}.jpg",
-    #                 "caption": f" 💠 سرویس: {obj.config_name}"}
-    #         cls.send_api("sendPhoto", data)
-    #
-    #     else:
-    #         cls.send_msg_to_user(chat_id, "سرویس ثبت نشده است.")
-    #
+                    },
+                }
+                cls.send_api("sendMessage", data)
+            else:
+                cls.send_msg_to_user(chat_id, "کانفیگی با این مشخصات ثبت نشده است.")
+        else:
+            cls.send_msg_to_user(chat_id, 'لینک نامعتبر است.')
+
+    @classmethod
+    def Qrcode(cls, chat_id, *args):
+        conf_uuid = args[1]
+        if BotConfigInfo.objects.filter(config_uuid=conf_uuid).exists():
+            obj = BotConfigInfo.objects.get(config_uuid=conf_uuid)
+            vless = (f"vless://{obj.config_uuid}@{obj.server.server_fake_domain}:{obj.server.inbound_port}?"
+                     f"security=none&encryption=none&host=speedtest.net&headerType=http&type=tcp#{obj.config_name}"
+                     )
+            qr = qrcode.QRCode(version=3, box_size=30, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
+            qr.add_data(vless)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            filename = conf_uuid
+            img.save(str(settings.MEDIA_ROOT) + f"/{filename}.jpg")
+            data = {'chat_id': chat_id,
+                    'photo': f"https://admin-napsv.ir/media/{filename}.jpg",
+                    "caption": f" 💠 سرویس: {obj.config_name}"}
+            cls.send_api("sendPhoto", data)
+
+        else:
+            cls.send_msg_to_user(chat_id, "سرویس ثبت نشده است.")
+
     @classmethod
     def myid(cls, chat_id, *args):
         cls.send_msg_to_user(chat_id, '👤 آیدی شما : \n ' f'🆔 `{chat_id}`')
@@ -535,35 +526,35 @@ class CommandRunner:
         }
         cls.send_api("copyMessage", data)
 
-    # @classmethod
-    # def my_services(cls, chat_id, *args):
-    #     services = ConfigsInfo.objects.filter(chat_id__chat_id=chat_id)
-    #     opts = []
-    #     for service in services:
-    #         opts.append([{'text': " 🔗 " + service.config_name + "\n" + service.server.server_name,
-    #                       'callback_data': f'service_status<~>{service.config_uuid}'}])
-    #     data = {
-    #         'chat_id': chat_id,
-    #         'text': '🌐 سرویس های شما 👇🏻',
-    #         'parse_mode': 'Markdown',
-    #         'reply_markup': {
-    #             'inline_keyboard': opts
-    #
-    #         },
-    #     }
-    #     if services.count() == 0:
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'text': 'شما سرویس ثبت شده ای ندارید.',
-    #             'parse_mode': 'Markdown',
-    #         }
-    #
-    #     if args:
-    #         msg_id = int(args[0])
-    #         data["message_id"] = msg_id
-    #         cls.send_api("editMessageText", data)
-    #     else:
-    #         cls.send_api("sendMessage", data)
+    @classmethod
+    def my_services(cls, chat_id, *args):
+        services = BotConfigInfo.objects.filter(customer__chat_id=chat_id)
+        opts = []
+        for service in services:
+            opts.append([{'text': " 🔗 " + service.config_name + "\n" + service.server.server_name,
+                          'callback_data': f'service_status<~>{service.config_uuid}'}])
+        data = {
+            'chat_id': chat_id,
+            'text': '🌐 سرویس های شما 👇🏻',
+            'parse_mode': 'Markdown',
+            'reply_markup': {
+                'inline_keyboard': opts
+
+            },
+        }
+        if services.count() == 0:
+            data = {
+                'chat_id': chat_id,
+                'text': 'شما سرویس ثبت شده ای ندارید.',
+                'parse_mode': 'Markdown',
+            }
+
+        if args:
+            msg_id = int(args[0])
+            data["message_id"] = msg_id
+            cls.send_api("editMessageText", data)
+        else:
+            cls.send_api("sendMessage", data)
 
     # @classmethod
     # def get_service(cls, chat_id, *args):
@@ -624,120 +615,6 @@ class CommandRunner:
     #             'inline_keyboard': keybord
     #         },
     #     }
-    #     cls.send_api("editMessageText", data)
-
-    # @classmethod
-    # def choose_location(cls, chat_id, *args):
-    #     msg_id = int(args[0])
-    #     arg_splited = args_spliter(args[1])
-    #     conf_uuid = arg_splited[0]
-    #     if ConfigsInfo.objects.filter(config_uuid=conf_uuid).exists():
-    #         service = ConfigsInfo.objects.get(config_uuid=conf_uuid)
-    #         keyboard = []
-    #         for i in ServerModel.objects.filter(active=True, iphone=service.server.iphone):
-    #             if i.server_id != service.server.server_id:
-    #                 keyboard.append([{'text': f'{i.server_name}',
-    #                                   'callback_data': f'change_location<~>{conf_uuid}<%>{i.server_id}'}])
-    #
-    #         keyboard.append([{'text': '🔙 بازگشت', 'callback_data': f'service_status<~>{conf_uuid}'}])
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"سرویس: {service.config_name}" "\n\n" f"🌐 سرور فعلی : {service.server.server_name}" "\n\n" "سرور مورد نظر را برای انتقال انتخاب کنید 👇🏻",
-    #             'reply_markup': {
-    #                 'inline_keyboard': keyboard
-    #             },
-    #         }
-    #     else:
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"سرویس پیدا نشد.",
-    #             'reply_markup': {
-    #                 'inline_keyboard': [
-    #                     [{'text': '🔙 بازگشت', 'callback_data': f'service_status<~>{conf_uuid}'}]
-    #                 ]
-    #             },
-    #         }
-    #     cls.send_api("editMessageText", data)
-    #
-    # @classmethod
-    # def change_location(cls, chat_id, *args):
-    #     msg_id = int(args[0])
-    #     arg_splited = args_spliter(args[1])
-    #     conf_uuid = arg_splited[0]
-    #     server_to = arg_splited[1]
-    #     if ConfigsInfo.objects.filter(config_uuid=conf_uuid).exists():
-    #         service = ConfigsInfo.objects.get(config_uuid=conf_uuid)
-    #         server_to = ServerModel.objects.get(server_id=server_to)
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"آیا از انتقال سرویس {service.config_name} از سرور {service.server.server_name} به {server_to.server_name} مطمئنید؟",
-    #             'reply_markup': {
-    #                 'inline_keyboard': [
-    #                     [{'text': '🛰 تایید انتقال ✅',
-    #                       'callback_data': f'confirm_change<~>{conf_uuid}<%>{server_to.server_id}'}],
-    #                     [{'text': '🔙 بازگشت', 'callback_data': f'service_status<~>{conf_uuid}'}]
-    #                 ]
-    #             },
-    #         }
-    #     else:
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"سرویس پیدا نشد.",
-    #             'reply_markup': {
-    #                 'inline_keyboard': [
-    #                     [{'text': '🔙 بازگشت', 'callback_data': f'service_status<~>{conf_uuid}'}]
-    #                 ]
-    #             },
-    #         }
-    #     cls.send_api("editMessageText", data)
-    #
-    # @classmethod
-    # def confirm_change(cls, chat_id, *args):
-    #     msg_id = int(args[0])
-    #     arg_splited = args_spliter(args[1])
-    #     conf_uuid = arg_splited[0]
-    #     server_to = int(arg_splited[1])
-    #     if ConfigsInfo.objects.filter(config_uuid=conf_uuid).exists():
-    #         service = ConfigsInfo.objects.get(config_uuid=conf_uuid)
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"🟢 درخواست انتقال شما ثبت شد و تا لحظاتی دیگر نتیجه اعلام میشود.",
-    #         }
-    #         cls.send_api("editMessageText", data)
-    #         if (int(JalaliDateTime.now().timestamp()) - service.change_location_time) > 604800:
-    #             api = ServerApi.change_location(service.server.server_id, server_to, conf_uuid)
-    #             if api == "ended":
-    #                 cls.send_msg_to_user(chat_id,
-    #                                      "کانفیگ شما به اتمام رسیده یا توسط ادمین غیرفعال گردیده است و نمیتوانید سرور آنرا تغییر دهید.")
-    #             elif api:
-    #                 cls.send_msg_to_user(chat_id,
-    #                                      f" ✅ سرویس {service.config_name} با موفقیت انتقال پیدا کرد و برای شما ارسال میشود.")
-    #                 Configs.send_config_to_user(chat_id, conf_uuid, server_to, service.config_name)
-    #                 service.change_location_time = int(JalaliDateTime.now().timestamp())
-    #                 service.server = ServerModel.objects.get(server_id=server_to)
-    #                 service.save()
-    #             else:
-    #                 cls.send_msg_to_user(chat_id,
-    #                                      f" 🔴 انتقال سرویس {service.config_name} با ارور مواجه شد، سرور دیگری برای انتقال انتخاب کنید یا دقایقی دیگر دوباره امتحان کنید.")
-    #         else:
-    #             cls.send_msg_to_user(chat_id,
-    #                                  "🔴 مشتری گرامی، هر سرویس محدودیت انتقال هفته ای یکبار دارد و شما در یک هفته اخیر این سرویس را انتقال داده اید; میتوانید در این مورد به ادمین پیام دهید.")
-    #     else:
-    #         data = {
-    #             'chat_id': chat_id,
-    #             'message_id': msg_id,
-    #             'text': f"سرویس پیدا نشد.",
-    #             'reply_markup': {
-    #                 'inline_keyboard': [
-    #                     [{'text': '🔙 بازگشت', 'callback_data': f'service_status<~>{conf_uuid}'}]
-    #                 ]
-    #             },
-    #         }
     #     cls.send_api("editMessageText", data)
 
     @classmethod
@@ -1143,7 +1020,6 @@ class CommandRunner:
     #                                  "در حال حاضر امکان دریافت کانفیگ تست نمی باشد، ساعاتی دیگر دوباره امتحان کنید.")
     #
 
-#TODO : add this function after create conf
     @classmethod
     def send_infinit_notification(cls, chat_id, iplimit, month):
         with open(settings.BASE_DIR / "settings.json", "r") as f:

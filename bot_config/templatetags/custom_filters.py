@@ -1,17 +1,51 @@
 from django import template
-from servers.models import BotConfigInfo, BotInfinitCongisLimit
+from bot_config.models import BotConfigInfo, BotInfinitCongisLimit
 from django.conf import settings
 import json
 from persiantools.jdatetime import JalaliDateTime
 import datetime, pytz
 from bot_finance.models import CreateConfigQueue
 from bot_finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue
+from bot_config.models import BotConfigsEveryServerUsage
+from utils import now_timestamp
+
 
 register = template.Library()
 
 with open(settings.BASE_DIR / "settings.json", "r") as f:
     UNLIMIT_LIMIT = json.load(f)["unlimit_limit"]
 
+
+@register.filter
+def expired(days_limit, start_timastamp):
+    if days_limit == 0:
+        return False
+    if ((start_timastamp + (days_limit * 86400)) - now_timestamp()) < 0:
+        return True
+    return False
+
+@register.filter
+def remain_days(days_limit, start_timastamp):
+    if start_timastamp:
+        remain =  ((start_timastamp + (days_limit * 86400)) - now_timestamp()) / 86400
+    else:
+        remain = days_limit
+    hour = int((abs(remain) % 1) * 24)
+    day = abs(int(remain))
+    text = f"{day}d  {hour}h"
+    print(remain)
+    if remain < 0:
+        text += " ago"
+    return text
+
+
+
+@register.filter
+def bot_add_usages(uuid):
+    add = 0
+    for i in BotConfigsEveryServerUsage.objects.filter(config__uuid=uuid):
+        add += i.usage_now
+    return add
 
 @register.filter
 def price(amount):
@@ -48,10 +82,10 @@ def config_seved(value):
 
 @register.filter(name="infinit_limit")
 def infinit_limit(value):
-    config_info = BotConfigInfo.objects.filter(config_uuid=value)
+    config_info = BotConfigInfo.objects.filter(uuid=value)
     if config_info.exists():
-        if BotInfinitCongisLimit.objects.filter(config__config_uuid=value).exists():
-            return BotInfinitCongisLimit.objects.get(config__config_uuid=value).limit
+        if BotInfinitCongisLimit.objects.filter(config__uuid=value).exists():
+            return BotInfinitCongisLimit.objects.get(config__uuid=value).limit
         else:
             return "Not Set"
     return None

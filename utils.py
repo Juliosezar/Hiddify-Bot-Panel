@@ -30,4 +30,4 @@ def generate_unique_name():
         f.seek(0)
         json.dump(setting, f)
         f.truncate()
-        return "Sub_" + str(counter)
+        return "NapsV_" + str(counter)

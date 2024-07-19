@@ -1,0 +1,209 @@
+{% load compress %}
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% include "base_head.html" %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'component.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'bot_config/config_page.css' %}">
+</head>
+
+<body dir="">
+    {% include "navbar.html" %}
+    {% include 'messages.html' %}
+<div id="main">
+        <h3 id="conf_name">{{ config_name }}</h3>
+        <div id="box0" dir="rtl">
+        {% if config_info %}
+            {% if config_info.customer == none %}
+                <h3 class="c_info"> یوزر: ---- <a id="u_reg" href="{% url "bot_customers:register_conf_for_customer" config_info.uuid %}"> Register 🆔</a></h3>
+{#                <h3 class="c_info"></h3>#}
+             {% else %}
+                <h3 class="c_info">یوزر: <a style="color: white" href="{% url "bot_customers:custumer_detail" config_info.customer.chat_id %}">{{ config_info.customer.chat_id }}</a></h3>
+            {% endif %}
+            <h3 class="c_info">ساخته توسط: {{ config_info.created_by }}</h3>
+            <h3 class="c_info">مبلغ: {{ config_info.price }} T</h3>
+            {% if config_info.paid %}
+            <h3 class="c_info">پرداخت شده: ✅</h3> {% else %} <h3 class="c_info">پرداخت شده: ❌</h3>
+            {% endif %}
+            <h3 class="c_info">تمدید: {{ config_info.renew_count }}</h3>
+        {% else %}
+            <h3 class="text_error">❗ کانفیگ در بات ثبت نشده است. ❗</h3>
+        {% endif %}
+        </div>
+
+        {% if not config_info.enable %}
+            <h4 id="dis" dir="rtl">⛔ این کانفیگ غیرفعال است. ⛔</h4>
+        {% endif %}
+        <div id="box1">
+            <div class="show_usage">
+                {% if config_info.usage_limit == 0  %}
+                    <div class="centering">
+                        <h4 class="usage_text">{{ usage|floatformat:2 }}GB / <span style="font-size: x-large">∞</span></h4>
+                        <div class="progress progressـusage_box">
+                            {% if not config_info.start_timestamp %}
+                                <div class="progressـusage progress-bar bg-success" role="progressbar" style="width:100%" aria-confinfonow="100" aria-confinfomin="0" aria-confinfomax="100">Not Started</div>
+                            {% else %}
+                                <div class="progressـusage progress-bar bg-unlimit" role="progressbar" style="width: 100%" aria-confinfonow="100" aria-confinfomin="0" aria-confinfomax="100">∞</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="safd">
+                        <div class="kdfj" >
+                        {% if config_info.uuid|infinit_limit %}
+                            <h3 class="sys_limit">⛔ {{ config_info.uuid|infinit_limit }} GB ⛔ </h3><a style="font-size: x-large" href="">🔏️</a> {# {% url "servers:change_unlimit_limit" config_info.uuid %} #}
+                        {% endif %}
+                         </div>
+                    </div>
+                {% else %}
+                    {% if usage|percent:config_info.usage_limit > 99 %}
+                        <div class="centering">
+                            <h4 class="usage_text">{{ usage|floatformat:2 }}GB /{{ config_info.usage_limit }}GB</h4>
+                            <div class="progress progressـusage_box">
+                                <div class="progressـusage progress-bar bg-danger" role="progressbar" style="width: {{ usage|percent:config_info.usage_limit }}%" aria-confinfonow="{{ usage|percent:config_info.usage_limit }}" aria-confinfomin="0" aria-confinfomax="100">{{ usage|percent:config_info.usage_limit }}%</div>
+                            </div>
+                        </div>
+                    {% elif usage|percent:config_info.usage_limit > 95 %}
+                        <div class="centering">
+                            <h4 class="usage_text">{{ usage|floatformat:2 }}GB /{{ config_info.usage_limit }}GB</h4>
+                            <div class="progress progressـusage_box">
+                                <div class="progressـusage progress-bar bg-warning" role="progressbar" style="width: {{ usage|percent:config_info.usage_limit }}%" aria-confinfonow="{{ usage|percent:config_info.usage_limit }}" aria-confinfomin="0" aria-confinfomax="100">{{ usage|percent:config_info.usage_limit }}%</div>
+                            </div>
+                        </div>
+                    {% elif usage|percent:config_info.usage_limit > 0 %}
+                        <div class="centering">
+                            <h4 class="usage_text">{{ usage|floatformat:2 }}GB /{{ config_info.usage_limit }}GB</h4>
+                            <div class="progress progressـusage_box">
+                                <div class="progressـusage progress-bar bg-info" role="progressbar" style="width: {{ usage|percent:config_info.usage_limit }}%" aria-confinfonow="{{ usage|percent:config_info.usage_limit }}" aria-confinfomin="0" aria-confinfomax="100">{{ usage|percent:config_info.usage_limit }}%</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="centering">
+                            <h4 class="usage_text">{{ usage|floatformat:2 }}GB /{{ config_info.usage_limit }}GB</h4>
+                            <div class="progress progressـusage_box">
+                                {% if config_info.started  %}
+                                    <div class="progressـusage progress-bar bg-info" role="progressbar" style="width:0%" aria-confinfonow="0" aria-confinfomin="0" aria-confinfomax="100">0%</div>
+                                {% else %}
+                                    <div class="progressـusage progress-bar bg-success" role="progressbar" style="width:100%" aria-confinfonow="0" aria-confinfomin="0" aria-confinfomax="100">Not Started</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="show_time">
+                {% if config_info.days_limit == 0 %}
+                    <div class="time">
+                        <h4 class="expire_text blue_infinite">⏳ ∞ day</h4>
+                    </div>
+                {% elif config_info.days_limit > 0 and not started %}
+                    <div class="time">
+                        <h4 class="expire_text green">⏳ {{ days_remain|dh }}</h4>
+                    </div>
+                {% elif days_remain > 3 %}
+                    <div class="time">
+                        <h4 class="expire_text blue">⏳ {{ days_remain|dh }}</h4>
+                    </div>
+                {% elif days_remain > 0 %}
+                    <div class="time">
+                        <h4 class="expire_text orange">⏳ {{ days_remain|dh }}</h4>
+                    </div>
+
+                {% else %}
+                    <div class="time">
+                        <h4 class="expire_text red">⏳ {{ days_remain|dh }} ago</h4>
+                    </div>
+                {% endif %}
+
+
+                <div class="time">
+                    {% if config_info.user_limit == 0 %}
+                        <h4 class="expire_text blue">👤 ∞ user</h4>
+                    {% else %}
+                        <h4 class="expire_text blue">👤 {{ config_info.user_limit }} user</h4>
+                    {% endif %}
+            </div>
+            </div>
+        </div>
+
+        <div id="box2">
+            <div>
+                <div class="btnslist">
+                    <button dir="rtl" class="btn" onclick="copyToClipboard('#bot_link')">📋 لینک دریافت کانفیگ 📋</button>
+                </div>
+                <div class="btnslist">
+                    <button class="btn" onclick="copyToClipboard('#vless')">📡 کپی کانفیگ 📡</button>
+                </div>
+
+
+
+                    <p hidden id="vless">{{ vless }}</p>
+                    <p hidden id="bot_link" style="white-space: pre-line;">{{ get_config_link }}</p>
+                <hr style="width: 100%; background-color: #d8d8d8">
+                <hr style="width: 100%; background-color: #d6d6d6">
+                <div class="conf_btnsbox">
+                {% if config_info %}
+                    <a class="conf_btnss tamdid_btn" href=""><img class="restart" src="{% static "img/icons8-restart-512.png" %}" alt=""> تمدید </a>
+                    <a style="text-wrap: avoid" class="conf_btnss tamdid_btn" href=""><img class="restart" src="{% static "img/location.png" %}" alt="">لوکیشن</a>
+                {% endif %}
+                <a class="conf_btnss change_btn" href=""><img class="enable" src="{% static "img/setting.png" %}" alt=""> ویرایش </a>
+                {% if config_info.enable %}
+                    <a class="conf_btnss disable_btn" href=""><img class="enable" src="{% static "img/disable.png" %}" alt=""> غیرفعال </a>
+                {% else %}
+                    <a class="conf_btnss disable_btn" href=""><img class="disable" src="{% static "img/enable.png" %}" alt=""> فعال کردن </a>
+                {% endif %}
+                <a class="conf_btnss delete_btn" href=""><img class="del_img" src="{% static 'img/icons8-delete-64.png' %}" alt=""> حذف </a>
+            </div>
+            </div>
+
+
+        </div>
+
+<script>
+            function copyToClipboard(element) {
+          var $temp = $("<textarea>");
+          $("body").append($temp);
+          var text = $(element).text();
+          $temp.val(text).select();
+          document.execCommand("copy");
+          $temp.remove();
+          alert("با موفقیت کپی شد.");
+        }
+</script>
+{% if config_info %}
+            <h4 id="his">History</h4>
+            <div class="xcontainer">
+
+		    		<table class="overflow-y">
+		    			<thead>
+		    				<tr>
+                                <th>Data/Time</th>
+                                <th>َAction</th>
+		    				</tr>
+		    			</thead>
+		    			<tbody>
+                        {% for x in conf_log %}
+                            <tr>
+                                <td>
+                                    {{ x.timestamp|timestamp }}
+                                </td>
+                                <td dir="ltr">
+                                    {{ x.action }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+		    			</tbody>
+		    		</table>
+            </div>
+{% endif %}
+
+
+    </div>
+{% include "loading.html" %}
+{% include "list_servers.html" %}
+
+</body>
+</html>

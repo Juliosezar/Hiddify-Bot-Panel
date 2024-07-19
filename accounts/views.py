@@ -5,6 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm, AddUserForm
 from .models import User
+from bot_customers.forms import SearchUserForm
+from bot_config.forms import SearchConfigForm
 
 # Create your views here.
 class LoginView(View):
@@ -58,7 +60,9 @@ class HomeBotView(LoginRequiredMixin, View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        return render(request, "home_bot.html")
+        search_user = SearchUserForm()
+        search_config = SearchConfigForm()
+        return render(request, "home_bot.html", {"search_user": search_user, "search_config": search_config})
 
 
 class HomeSellersView(LoginRequiredMixin, View):

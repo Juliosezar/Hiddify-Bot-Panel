@@ -11,7 +11,7 @@ body {
     align-items: center;
     width: 100%;
 }
-input {
+input, select {
     width: 100%;
     text-align: center;
 }

@@ -38,15 +38,13 @@
     <div id="main">
         <div id="box1">
             <div id="searchbox">
-{#                <form novalidate action="{% url 'servers:list_configs_searches' %}" class="serch_box_inside" method="post">#}
-                <form novalidate action="" class="serch_box_inside" method="post">
+                <form novalidate action="{% url 'bot_config:list_searched_configs' %}" class="serch_box_inside" method="post">
                     {% csrf_token %}
                     <img class="search_img" src="{% static 'img/search-config.png' %}" alt="search">
                     {{ search_config.search_config }}
                     <input class="input_btn submit_btn" type="submit" value="🔍">
                 </form>
-{#                <form novalidate action="{% url 'customers:custumers_list' %}" class="serch_box_inside" method="post">#}
-                <form novalidate action="" class="serch_box_inside" method="post">
+                <form novalidate action="{% url 'bot_customers:custumers_list' %}" class="serch_box_inside" method="post">
                     {% csrf_token %}
                     <img class="search_img" src="{% static 'img/search-user.png' %}" alt="search">
                     {{ search_user.search_user }}
@@ -54,7 +52,7 @@
                 </form>
             </div>
             <a href="{% url 'bot_finance:confirm_payments' 1 %}" class="links link2" id="pay_confirm">✅ تایید پرداخت 💳</a>
-{#            <button class="links link2" id="create_config">➕ ساخت کانفیگ 🔗</button>#}
+            <a href="{% url "bot_config:bot_create_config" "auto" %}" class="links">➕ ساخت کانفیگ 🔗</a>
 {#            <button class="links link2" id="list_config">📋 لیست کانفیگ ها 🔗</button>#}
             <a href="{% url 'servers:show_servers' %}" class="links" id="servers">🌐 سرور ها 📶</a>
 {#            <a href="{% url 'customers:custumers_list' %}" class="links" id="customers">👥 مشتری ها 🤖</a>#}
@@ -62,7 +60,7 @@
 {#            <a href="{% url "reports:pay_logs" %}" class="links" id="setting">🗃️ Pays Log 💰</a>#}
 {#            <a href="{% url "reports:celery_delete_conf_logs" %}" class="links" id="setting">🗃️ Celery Log 🗑</a>#}
 {#            <a href="{% url "reports:send_msgs_log" %}" class="links" id="setting">🗃️ MSG Log 📨</a>#}
-{#            <a href="{% url 'customers:send_msg_to_all' %}" class="links" id="message">️📝 پیام همگانی 📨</a>#}
+            <a href="{% url 'bot_customers:send_msg_to_all' %}" class="links" id="message">️📝 پیام همگانی 📨</a>
 {#            <a href="{% url 'finance:show_prices' %}" class="links" id="tarefeh">💰 تعرفه ها 🛒</a>#}
 {#            <a href="{% url "reports:reports" %}" class="links" id="report">📊 گزارشات 📈</a>#}
 {#            <a href="{% url 'finance:show_off_codes' %}" class="links" id="tarefeh">💲 کد تخفیف 🆓</a>#}
