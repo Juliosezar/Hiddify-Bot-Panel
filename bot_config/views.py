@@ -72,7 +72,6 @@ class ConfigPageView(LoginRequiredMixin, View):
                         "days_remain": days_remain, "started":started})
 
 
-
 class ListConfigsSearched(LoginRequiredMixin, View):
     def post(self, request):
         form = SearchConfigForm(request.POST)
@@ -83,7 +82,41 @@ class ListConfigsSearched(LoginRequiredMixin, View):
                 messages.error(request, 'کانفیگی با این مشخصات یافت نشد.')
             return render(request, "list_configs_searched.html",
                           {"configs_model": reversed(model_obj), "search_config": form})
-        return redirect('accounts:home')
+        return redirect('accounts:home_bot')
+
+
+class ConfigsListView(ListConfigsSearched, View):
+
+    def get(self, request, *args, **kwargs):
+        query_string = request.META['QUERY_STRING']
+        if query_string.startswith("search="):
+            searched = query_string.split("search=")[1]
+        else:
+            searched = False
+        print(searched)
+        list_configs = []
+        configs = BotConfigInfo.objects.all()
+        now_time = now_timestamp()
+        for config in configs:
+            if searched:
+                if not searched.lower() in config.name.lower() and not searched.lower() in str(config.uuid):
+                    continue
+            sum_usage = 0
+            for usages in config.botconfigseveryserverusage_set.all():
+                sum_usage += usages.usage_now
+            end_usage = False if config.usage_limit == 0 or sum_usage < config.usage_limit else True
+            if config.start_timestamp:
+                remain = ((config.start_timestamp + (config.days_limit * 86400)) - now_time) / 86400
+                expired = True if remain < 0 else False
+            else:
+                expired = False
+                remain = config.days_limit
+            list_configs.append({"config":config, "sum_usage": sum_usage, "remain": remain, "expired": expired, "end_usage":end_usage})
+        return render(request, "list_configs.html", {"list_configs": list_configs, "searched":searched})
+
+
+
+
 
 
 # create config by admin api

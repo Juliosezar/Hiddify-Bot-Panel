@@ -191,7 +191,7 @@ li {
 	color: white;
 	padding: 0.7rem 0.5rem;
 	border-radius: 10px;
-		margin: 0;
+	margin: 0;
 }
 
 .hidephone {
@@ -202,7 +202,7 @@ li {
 	justify-items: center;
 	justify-content: center;
 }
-@media (max-width: 1000px) {
+@media (max-width: 1200px) {
 	.header{
 		display: flex;
 		flex-direction: column;
@@ -211,7 +211,6 @@ li {
     body {
         margin: 0;
     }
-
 
 	hr{
 		width: 100%;
@@ -363,7 +362,7 @@ a:hover {
     font-size: small;
     margin: 0 0 0 1rem;
 }
-@media (max-width: 650px) {
+@media (max-width: 647px) {
     .server_name {
     font-size: large;
     padding: 1rem 2rem;
@@ -371,6 +370,7 @@ a:hover {
     min-width: 11rem;
 
 }
+
 
 .close_btn {
     font-size: medium;
@@ -389,3 +389,6 @@ a:hover {
 
 }
 
+.www {
+	max-width: 10rem;
+}

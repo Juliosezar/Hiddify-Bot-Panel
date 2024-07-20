@@ -12,15 +12,15 @@
 </head>
 
 <body dir="">
-    {% include "navbar.html" %}
+    {% include "navbar_bot.html" %}
     {% include 'messages.html' %}
 <div id="main">
-        <h3 id="conf_name">{{ config_name }}</h3>
+        <h3 id="conf_name">{{ config_info.name }}</h3>
+        <h3 id="conf_uuid">{{ config_info.uuid }}</h3>
         <div id="box0" dir="rtl">
         {% if config_info %}
             {% if config_info.customer == none %}
                 <h3 class="c_info"> یوزر: ---- <a id="u_reg" href="{% url "bot_customers:register_conf_for_customer" config_info.uuid %}"> Register 🆔</a></h3>
-{#                <h3 class="c_info"></h3>#}
              {% else %}
                 <h3 class="c_info">یوزر: <a style="color: white" href="{% url "bot_customers:custumer_detail" config_info.customer.chat_id %}">{{ config_info.customer.chat_id }}</a></h3>
             {% endif %}
@@ -105,16 +105,16 @@
                     </div>
                 {% elif days_remain > 3 %}
                     <div class="time">
-                        <h4 class="expire_text blue">⏳ {{ days_remain|dh }}</h4>
+                        <h4 class="expire_text blue">⏳ {{ days_remain|dh }} / {{ config_info.days_limit }}d</h4>
                     </div>
                 {% elif days_remain > 0 %}
                     <div class="time">
-                        <h4 class="expire_text orange">⏳ {{ days_remain|dh }}</h4>
+                        <h4 class="expire_text orange">⏳ {{ days_remain|dh }} / {{ config_info.days_limit }}d</h4>
                     </div>
 
                 {% else %}
                     <div class="time">
-                        <h4 class="expire_text red">⏳ {{ days_remain|dh }} ago</h4>
+                        <h4 class="expire_text red">⏳ {{ days_remain|dh }} ago / {{ config_info.days_limit }}d</h4>
                     </div>
                 {% endif %}
 
@@ -147,7 +147,6 @@
                 <div class="conf_btnsbox">
                 {% if config_info %}
                     <a class="conf_btnss tamdid_btn" href=""><img class="restart" src="{% static "img/icons8-restart-512.png" %}" alt=""> تمدید </a>
-                    <a style="text-wrap: avoid" class="conf_btnss tamdid_btn" href=""><img class="restart" src="{% static "img/location.png" %}" alt="">لوکیشن</a>
                 {% endif %}
                 <a class="conf_btnss change_btn" href=""><img class="enable" src="{% static "img/setting.png" %}" alt=""> ویرایش </a>
                 {% if config_info.enable %}
@@ -203,7 +202,6 @@
 
     </div>
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 
 </body>
 </html>

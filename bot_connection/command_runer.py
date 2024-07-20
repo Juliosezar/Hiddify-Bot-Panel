@@ -113,18 +113,20 @@ class CommandRunner:
     def get_user_info(cls, chat_id, *args):
         data = {'chat_id': chat_id}
         info = CommandRunner.send_api("getChat", data)
-        info = info.json()
-        if "username" in info["result"]:
-            username = info["result"]["username"]
-        else:
-            username = None
+        if info:
+            info = info.json()
+            if "username" in info["result"]:
+                username = info["result"]["username"]
+            else:
+                username = None
 
-        if "first_name" in info["result"]:
-            first_name = info["result"]["first_name"]
-        else:
-            first_name = ""
+            if "first_name" in info["result"]:
+                first_name = info["result"]["first_name"]
+            else:
+                first_name = ""
 
-        return {"username": username, "first_name": first_name}
+            return {"username": username, "first_name": first_name}
+        return False
 
     @classmethod
     def welcome(cls, chat_id, *args):
@@ -133,8 +135,9 @@ class CommandRunner:
     @classmethod
     def main_menu(cls, chat_id, *args):
         user_info = CommandRunner.get_user_info(chat_id)
-        if not CustomerAction.check_custumer_info(chat_id, user_info["first_name"], user_info["username"]):
-            cls.welcome(chat_id)
+        if user_info:
+            if not CustomerAction.check_custumer_info(chat_id, user_info["first_name"], user_info["username"]):
+                cls.welcome(chat_id)
         CustomerAction.change_custimer_temp_status(chat_id, "normal")
 
         data = {

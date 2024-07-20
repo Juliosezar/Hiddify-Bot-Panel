@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'servers/add_server.css' %}">
 </head>
 <body>
-{% include "navbar.html" %}
+{% include "navbar_bot.html" %}
 {% include 'messages.html' %}
 <div id="main">
         <form novalidate action="" method="post" dir="ltr">
@@ -38,7 +38,6 @@
         </form>
     </div>
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 
 </body>
 </html>

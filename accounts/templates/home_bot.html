@@ -33,7 +33,49 @@
 
 <body dir="rtl">
 
-    {% include "navbar.html" %}
+    <header dir="ltr" class="header">
+    <h1 class="logo"><a id="logo" href="{% url 'accounts:home_bot' %}">NapsV Telegram BOT</a></h1>
+    <ul class="main-nav">
+        <div class="dropdown www">
+            <h3 dir="rtl" class="dropbtn" id="user boxx" >
+                <div class="boz">
+                    <span id="username">{{ user.username }}</span>
+                    <img id="usericon" src="{% static "img/user.png" %}" alt="user">
+                </div>
+            </h3>
+            <div class="dropdown-content">
+                <a href="{% url 'accounts:logout' %}">خروج از حساب</a>
+            </div>
+        </div>
+        <li id="cahnge_li" ><a  class="www" id="home change_a" href='{% url 'accounts:home_sellers' %}'><img
+                src="{% static "img/change.png" %}" id="usericon" alt=""> Panel</a></li>
+
+        <style>
+            #cahnge_li {
+                display: flex;
+                flex-direction: row;
+                width:35vw;
+                justify-content:space-around;
+                align-content: center;
+                align-items: center;
+                justify-items: center;
+                padding: 0;
+            }
+            #change_a {
+                width: max-content;
+                padding: 0.6rem 0;
+                margin: 0;
+                align-content: center;
+                display:flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                text-align: center
+            }
+        </style>
+        <li class="hidephone"><a class="www" href="{% url "bot_config:bot_create_config" "auto" %}" id="action_create_config">ساخت کانفیگ</a></li>
+        <li class="hidephone"><a class="www" href="{% url "bot_configs:list_configs" %}" id="action_list_config">لیست کانفیگ ها</a></li>
+    </ul>
+</header>
     {% include 'messages.html' %}
     <div id="main">
         <div id="box1">
@@ -52,26 +94,25 @@
                 </form>
             </div>
             <a href="{% url 'bot_finance:confirm_payments' 1 %}" class="links link2" id="pay_confirm">✅ تایید پرداخت 💳</a>
-            <a href="{% url "bot_config:bot_create_config" "auto" %}" class="links">➕ ساخت کانفیگ 🔗</a>
-{#            <button class="links link2" id="list_config">📋 لیست کانفیگ ها 🔗</button>#}
+            <a href="{% url "bot_config:bot_create_config" "auto" %}" class="links link2">➕ ساخت کانفیگ 🔗</a>
+            <a href="{% url "bot_configs:list_configs" %}" class="links link2">📋 لیست کانفیگ ها 🔗</a>
             <a href="{% url 'servers:show_servers' %}" class="links" id="servers">🌐 سرور ها 📶</a>
-{#            <a href="{% url 'customers:custumers_list' %}" class="links" id="customers">👥 مشتری ها 🤖</a>#}
+            <a href="{% url 'bot_customers:custumers_list' %}" class="links" id="customers">👥 مشتری ها 🤖</a>
 {#            <a href="{% url "reports:admin_logs" %}" class="links" id="setting">🗃️ Admin Log 👨🏻‍🔧</a>#}
 {#            <a href="{% url "reports:pay_logs" %}" class="links" id="setting">🗃️ Pays Log 💰</a>#}
 {#            <a href="{% url "reports:celery_delete_conf_logs" %}" class="links" id="setting">🗃️ Celery Log 🗑</a>#}
 {#            <a href="{% url "reports:send_msgs_log" %}" class="links" id="setting">🗃️ MSG Log 📨</a>#}
             <a href="{% url 'bot_customers:send_msg_to_all' %}" class="links" id="message">️📝 پیام همگانی 📨</a>
-{#            <a href="{% url 'finance:show_prices' %}" class="links" id="tarefeh">💰 تعرفه ها 🛒</a>#}
+            <a href="{% url 'bot_finance:show_prices' %}" class="links" id="tarefeh">💰 تعرفه ها 🛒</a>
 {#            <a href="{% url "reports:reports" %}" class="links" id="report">📊 گزارشات 📈</a>#}
-{#            <a href="{% url 'finance:show_off_codes' %}" class="links" id="tarefeh">💲 کد تخفیف 🆓</a>#}
-{#            <a href="{% url "accounts:settings" %}" class="links" id="setting">⚙️ تنظیمات 🛠️</a>#}
-{#            <a href="{% url "accounts:vpn_apps" %}" class="links" id="setting">💻 Apps 📱️</a>#}
+            <a href="{% url 'bot_finance:show_off_codes' %}" class="links" id="tarefeh">💲 کد تخفیف 🆓</a>
+            <a href="{% url "accounts:settings" %}" class="links" id="setting">⚙️ تنظیمات 🛠️</a>
+            <a href="{% url "accounts:vpn_apps" %}" class="links" id="setting">💻 Apps 📱️</a>
 {#            <a href="" class="links" id="setting">❗️ Errors ❗️</a>#}
         </div>
     </div>
 
 
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 </body>
 </html>

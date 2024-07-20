@@ -32,7 +32,7 @@ def remain_days(days_limit, start_timastamp):
         remain = days_limit
     hour = int((abs(remain) % 1) * 24)
     day = abs(int(remain))
-    text = f"{day}d  {hour}h"
+    text = f"{day}d {hour}h"
     print(remain)
     if remain < 0:
         text += " ago"
@@ -61,7 +61,7 @@ def percent_usage(value, arg):
 def day_and_hour(value):
     hour = int((abs(value) % 1) * 24)
     day = abs(int(value))
-    return f"{day}d  {hour}h"
+    return f"{day}d {hour}h"
 
 
 @register.filter(name="break_name")

@@ -26,7 +26,7 @@ class CustomerList(LoginRequiredMixin, View):
             if not customer_model.exists():
                 messages.error(request, "یوزری با این مشخصات یافت نشد.")
             return render(request, 'list_custumers.html', {"customer_model": reversed(customer_model),'search_user':form})
-        return redirect('accounts:home')
+        return redirect('bot_customers:custumers_list')
 
 
 class CustomerDetail(LoginRequiredMixin, View):
@@ -94,8 +94,11 @@ class UpdateCustumer(LoginRequiredMixin, View):
     def get(self, request, userid):
         from bot_connection.command_runer import CommandRunner
         get = CommandRunner.get_user_info(userid)
-        CustomerAction.check_custumer_info(userid, get["first_name"], get["username"])
-        messages.success(request, "اطلاعات یوزر آپدیت شد.")
+        if get:
+            CustomerAction.check_custumer_info(userid, get["first_name"], get["username"])
+            messages.success(request, "اطلاعات یوزر آپدیت شد.")
+        else:
+            messages.error(request, "ارور در آپدیت اطلاعات یوزر.")
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
 

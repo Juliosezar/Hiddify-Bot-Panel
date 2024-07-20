@@ -8,6 +8,10 @@ body {
     margin: 3rem 0 1rem 0;
     font-size: xx-large;
 }
+#conf_uuid {
+    font-size: large;
+    color: #6c6c6c;
+}
 
 #main {
     display: flex;
@@ -231,6 +235,9 @@ img {
 .text_error {
     font-size: large;
 }
+    #conf_uuid {
+        font-size: small;
+    }
 }
 
 @media (min-width: 1000px) {

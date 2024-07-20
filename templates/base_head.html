@@ -27,8 +27,6 @@
 
     <script>
         $(document).ready(function() {
-            $('#create_config_box').hide()
-            $('#list_config_box').hide()
             $("#loading").hide()
             $(".submit_btn").click(function () {
                 $("#main").hide();
@@ -37,24 +35,9 @@
             $("a").click(function () {
                 $("#main").hide();
                 $("#loading").show();
-                $('#list_config_box').hide()   
-                $('#create_config_box').hide()
             });
-            $('#action_create_config').click(function () {
-                $('#main').hide()
-                $('#create_config_box').show()
-                $('#list_config_box').hide()    
-            }
-            )
-            $('#action_list_config').click(function () {
-                $('#main').hide()
-                $('#list_config_box').show()
-                $('#create_config_box').hide()
-                }
-            )
+    
             $('.close_btn').click(function () {
-                $('#create_config_box').hide()
-                $('#list_config_box').hide()
                 $('#main').show()
             })
         });

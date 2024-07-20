@@ -3,7 +3,7 @@ from pathlib import Path
 from os import environ
 from dotenv import load_dotenv
 
-# import finance.apps
+# import bot_finance.apps
 # import servers.apps
 
 load_dotenv()

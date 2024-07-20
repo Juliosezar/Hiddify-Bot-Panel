@@ -6,14 +6,14 @@
 		<title>List Configs</title>
         {% include "base_head.html" %}
         <link rel="stylesheet" type="text/css" href="{% static 'custumers/component.css' %}"/>
-        <link rel="stylesheet" type="text/css" href="{% static 'finance/surathesab_page.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'bot_finance/surathesab_page.css' %}"/>
     </head>
 	<body dir="ltr">
-        {% include "navbar.html" %}
+        {% include "navbar_bot.html" %}
         {% include 'messages.html' %}
         <div id="main">
             <div class="addbox">
-                <a href="{% url 'finance:add_off_codes' %}" class="addprice">➕ جدید</a>
+                <a href="{% url 'bot_finance:add_off_codes' %}" class="addprice">➕ جدید</a>
             </div>
             <h3 id="counter">لیست کدهای تخفیف</h3>
 		    <div class="xcontainer">
@@ -48,7 +48,7 @@
                             <td>
                                 <div class="action">
                                     <button class="btn copy delete" onclick="copyToClipboard('#vless_{{ row.id }}')">کپی لینک</button>
-                                    <a href="{% url 'finance:delete_off_code' row.uid %}" class="delete">Delete</a>
+                                    <a href="{% url 'bot_finance:delete_off_code' row.uid %}" class="delete">Delete</a>
                                 </div>
                                     <p hidden id="vless_{{ row.id }}">tg://resolve?domain={{ bot_username }}&start=off_code_{{ row.uid }}</p>
                             </td>
@@ -87,6 +87,5 @@
 		<script src={% static "js/list.js" %}></script>
 	</body>
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 
 </html>

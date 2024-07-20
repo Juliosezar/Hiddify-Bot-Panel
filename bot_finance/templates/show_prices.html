@@ -5,15 +5,15 @@
 	<head>
 		<title>List Configs</title>
         {% include "base_head.html" %}
-        <link rel="stylesheet" type="text/css" href="{% static 'custumers/component.css' %}"/>
-        <link rel="stylesheet" type="text/css" href="{% static 'finance/surathesab_page.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'component.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'bot_finance/surathesab_page.css' %}"/>
     </head>
 	<body dir="ltr">
-        {% include "navbar.html" %}
+        {% include "navbar_bot.html" %}
         {% include 'messages.html' %}
         <div id="main">
             <div class="addbox">
-                <a href="{% url 'finance:add_price' %}" class="addprice">➕ جدید</a>
+                <a href="{% url 'bot_finance:add_price' %}" class="addprice">➕ جدید</a>
             </div>
             <h3 id="counter">لیست تعرفه ها</h3>
 		    <div class="xcontainer">
@@ -51,7 +51,7 @@
                             <td>{{ row.price|price }} T </td>
                                 <td>
                                     <div class="action">
-                                        <a href="{% url 'finance:delete_or_edit_price' row.id 'delete' %}" class="delete">Delete</a>
+                                        <a href="{% url 'bot_finance:delete_or_edit_price' row.id 'delete' %}" class="delete">Delete</a>
                                     </div>
                                 </td>
 
@@ -72,6 +72,5 @@
 	</body>
 
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 
 </html>

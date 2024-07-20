@@ -20,7 +20,7 @@
     </script>
 </head>
 <body>
-    {% include "navbar.html" %}
+    {% include "navbar_bot.html" %}
     {% if messages %}
         <div class="message-container" dir="rtl">
             {% for msg in messages %}
@@ -29,7 +29,7 @@
         </div>
     {% endif %}
     <div id="main">
-        <h3 id="title">User Info: {{ customer_obj.userid }}</h3>
+        <h3 id="title">User Info: {{ customer_obj.chat_id }}</h3>
             {% if customer_obj.banned %}
                 <h3 dir="rtl" style="color: #0a0000" class="banned">⛔️ یوزر توسط ادمین بن شده است. ⛔️</h3>
             {% endif %}
@@ -110,7 +110,6 @@
 
     </div>
 {% include "loading.html" %}
-{% include "list_servers.html" %}
 
 </body>
 </html>

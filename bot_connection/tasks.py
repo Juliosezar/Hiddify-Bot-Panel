@@ -3,7 +3,7 @@ from .models import SendMessage # EndOfConfigCounter
 # from servers.models import CreateConfigQueue, ConfigsInfo, Server, TamdidConfigQueue, TestConfig
 # from servers.views import Configs, ServerApi, InfinitCongisLimit
 from django.conf import settings
-# from finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue
+# from bot_finance.models import ConfirmPaymentQueue, ConfirmTamdidPaymentQueue
 # import json
 # from reports.views import Log
 # from custumers.models import Customer
