@@ -1,0 +1,97 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="fa" class="no-js">
+	<head>
+		<title>List Configs</title>
+        {% include "base_head.html" %}
+        <link rel="stylesheet" type="text/css" href="{% static 'component.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'bot_finance/surathesab_page.css' %}"/>
+    </head>
+	<body dir="ltr">
+        {% include "navbar_sellers.html" %}
+        {% include 'messages.html' %}
+        <div id="main">
+
+            <h3 style="margin-top: 2rem" dir="auto" id="counter">صورتحساب کل: <b>{{ sum_pays|price }} T</b></h3>
+        {% if user.level_access == 10 %}
+            <div>
+                <form action="" novalidate method="post">
+                    {% csrf_token %}
+                    <h3 id="pr" style="margin: 0">{{ form.amount }},000 T</h3>
+                    <input type="submit" value="پرداخت" id="subm">
+                </form>
+            </div>
+        <style>
+            #id_amount {
+                font-size: larger;
+                text-align: center;
+                max-width: 7rem;
+            }
+            #pr {
+                    font-size: larger;
+                }
+            form {
+                margin: 1rem 0.25rem;
+                width: max-content;
+                display: flex;
+                flex-direction: row-reverse;
+                justify-items: center;
+                align-items: center;
+                align-content: center;
+                justify-content: space-around;
+            }
+            #subm {
+                margin: 0;
+            }
+            @media (max-width: 650px) {
+                #id_amount {
+                font-size: large;
+                    width: 45vw;
+            }
+                #pr {
+                    font-size: large;
+                }
+                form {
+                    width: max-content;
+                }
+            }
+        </style>
+        {% endif %}
+		    <div class="xcontainer">
+		    		<table class="overflow-y">
+		    			<thead>
+		    				<tr>
+                                <th>Price</th>
+                                <th>Description</th>
+                                <th>Date/Time</th>
+                                <th>Create for</th>
+                                <th>Create by</th>
+                            </tr>
+		    			</thead>
+		    			<tbody>
+                        {% for obj in pays_obj %}
+		    				<tr style="{% if obj.amount <= 0 %}background-color: #acff95{% endif %}">
+                                <td>{{ obj.amount|price }} T</td>
+                                <td>{{ obj.description }}</td>
+                                <td>{{ obj.timestamp|timestamp }}</td>
+                                <td>{{ obj.seller.username }}</td>
+                                <td>{{ obj.created_by.username }}</td>
+                            </tr>
+                        {% endfor %}
+		    			</tbody>
+		    		</table>
+            </div>
+
+
+        </div>
+
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+		<script src={% static "js/list.js" %}></script>
+	</body>
+
+{% include "loading.html" %}
+
+</html>
