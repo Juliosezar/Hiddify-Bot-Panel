@@ -14,8 +14,9 @@ class BotConfigInfo(models.Model):
     usage_limit = models.IntegerField(default=0)
     days_limit = models.IntegerField(default=0)
     start_timestamp = models.PositiveIntegerField(null=True)
-    user_limit = models.PositiveIntegerField(null=True)
+    user_limit = models.PositiveIntegerField(default=0)
     enable = models.BooleanField(default=True)
+    update = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -29,7 +30,7 @@ class BotInfinitCongisLimit(models.Model):
 class BotConfigsEveryServerUsage(models.Model):
     server = models.ForeignKey(Server, on_delete=models.CASCADE)
     config = models.ForeignKey(BotConfigInfo, on_delete=models.CASCADE)
-    usage_now = models.FloatField(null=True)
+    usage_now = models.FloatField(default=0)
     update_timestamp = models.PositiveIntegerField(null=True)
 
     def __str__(self):

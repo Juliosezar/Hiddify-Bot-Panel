@@ -11,13 +11,12 @@ def create_configs(conf_uuid):
 
     for server in Server.objects.all():
         print(server.name)
-        response = HiddifyApi.create_config(server, config_obj, "bot_sub")
+        response = HiddifyApi.create_config(server, config_obj, "bot")
         if response:
-            BotEveryServer.objects.create(
+            BotConfigsEveryServerUsage.objects.create(
                 server=server,
                 config=config_obj,
                 usage_now=0,
-                days_now=0,
                 update_timestamp=now_timestamp(),
             )
 

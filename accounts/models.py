@@ -5,6 +5,10 @@ class User(AbstractBaseUser):
     username = models.CharField(unique=True, max_length=20)
     is_active = models.BooleanField(default=True)
     level_access = models.PositiveIntegerField(default=0, choices=[(0, 'Seller'), (1, 'SubSeller'), (10, 'Admin')])
+    payment_limit = models.PositiveIntegerField(default=0)
+    finanace_access = models.BooleanField(default=True)
+    create_config = models.BooleanField(default=True)
+    list_configs = models.BooleanField(default=True)
 
     objects = UserManager()
 

@@ -6,7 +6,7 @@ import json
 from .models import User
 
 class UserCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
     password2 = forms.CharField(label='confirm Password', widget=forms.PasswordInput)
 
 
@@ -16,7 +16,7 @@ class UserCreationForm(forms.ModelForm):
 
     def clean_password2(self):
         cd = self.cleaned_data
-        if cd["password"] and cd["password2"] and cd['password1'] != cd['password2']:
+        if cd["password"] and cd["password2"] and cd['password'] != cd['password2']:
             raise forms.ValidationError("Passwords must match")
         return cd["password2"]
 

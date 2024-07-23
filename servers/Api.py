@@ -6,11 +6,12 @@ from utils import now_date, now_timestamp
 class HiddifyApi:
     @classmethod
     def create_config(cls, server_obj, config_obj, partition, comment=None):
-        print("api")
+        print(partition)
         partition_dic = {
-            "sellers_sub": server_obj.sellers_sub_uuid,
-            "bot_sub": server_obj.bot_sub_uuid,
+            "sellers": server_obj.sellers_sub_uuid,
+            "bot": server_obj.bot_sub_uuid,
         }
+        print(partition_dic)
         partition_uuid = str(partition_dic[partition])
 
         url = f"{server_obj.server_domain}/{server_obj.proxy_path}/api/v2/admin/user/"

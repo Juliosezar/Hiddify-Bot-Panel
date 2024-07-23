@@ -1,7 +1,7 @@
 from bot_finance.models import TamdidConfigQueue, CreateConfigQueue, UserActiveOffCodes
 from bot_finance.models import Customer
 from bot_config.models import BotConfigInfo, BotInfinitCongisLimit
-from utils import generate_unique_name
+from utils import generate_unique_name, now_timestamp
 import uuid
 from bot_finance.actions import FinanceAction
 from django.conf import settings
@@ -28,6 +28,7 @@ class BotAction:
             user_limit=user_limit,
             usage_limit=usege_limit,
             days_limit=days_limit,
+            update=now_timestamp()
         ).save()
 
     @classmethod

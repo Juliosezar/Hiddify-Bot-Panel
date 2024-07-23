@@ -14,6 +14,7 @@ from utils import now_timestamp
 from django.contrib import messages
 from .forms import SearchConfigForm
 
+
 class BotCreateConfigView(LoginRequiredMixin, View):
     def get(self, request, form_type):
         forms = {'auto': CreateConfigForm, 'manual': ManualCreateConfigForm}
@@ -46,9 +47,9 @@ class BotCreateConfigView(LoginRequiredMixin, View):
             paid = cd["paid"]
             if form_type == 'auto':
                 days_limit = days_limit * 30
-            create_config = BotAction.create_config_by_admins(days_limit, usage_limit, ip_limit, price, paid, request.user.username),
+            create_config = BotAction.create_config_by_admins(days_limit, usage_limit, ip_limit, price, paid, request.user.username)
             print(create_config)
-            return redirect('bot_config:config_page',create_config[0])
+            return redirect('bot_config:config_page',create_config)
 
 
         return render(request, 'create_config.html',
@@ -95,7 +96,7 @@ class ConfigsListView(ListConfigsSearched, View):
             searched = False
         print(searched)
         list_configs = []
-        configs = BotConfigInfo.objects.all()
+        configs = BotConfigInfo.objects.all().order_by("-update", "-name")
         now_time = now_timestamp()
         for config in configs:
             if searched:

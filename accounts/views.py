@@ -9,6 +9,8 @@ from bot_customers.forms import SearchUserForm
 from bot_config.forms import SearchConfigForm
 import json
 from django.conf import settings
+from sellers_finance.models import SubSellrsRelation
+
 
 # Create your views here.
 class LoginView(View):
@@ -69,7 +71,8 @@ class HomeBotView(LoginRequiredMixin, View):
 
 class HomeSellersView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "home_sellers.html")
+        search_config = SearchConfigForm()
+        return render(request, "home_sellers.html", {"search_config": search_config})
 
 
 class SettingsPage(LoginRequiredMixin, View):
