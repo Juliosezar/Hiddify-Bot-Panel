@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     "sellers_reports.apps.SellersReportsConfig",
     'servers.apps.ServersConfig',
     'bot_config.apps.BotConfigConfig',
-    'sellers_config.apps.SellersConfigConfig'
+    'sellers_config.apps.SellersConfigConfig',
+    'sellers_connection.apps.SellersConnectionConfig'
 ]
 
 MIDDLEWARE = [

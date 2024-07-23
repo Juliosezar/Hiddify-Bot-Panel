@@ -4,6 +4,8 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 import json
 from .models import User
+from sellers_connection.models import Bots
+
 
 class UserCreationForm(forms.ModelForm):
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
@@ -120,3 +122,27 @@ class VpnAppsForm(forms.Form):
     app_name = forms.CharField(max_length=25,required=False)
     download_url = forms.URLField(required=False)
     guid = forms.IntegerField(required=False)
+
+
+class SellersAccessesForm(forms.Form):
+    username = forms.CharField(max_length=20, required=False)
+    password = forms.CharField(required=False)
+    level_access = forms.ChoiceField(choices=[("0", "فروشنده معمولی"), ("1", "فروشنده عمده(دارای زیرمجموعه)")], required=False)
+    payment_limit = forms.IntegerField(min_value=0, max_value=99000)
+    finanace_access = forms.BooleanField(initial=True, required=False)
+    create_config_acc = forms.BooleanField(initial=True, required=False)
+    list_configs_acc = forms.BooleanField(initial=True, required=False)
+    delete_config_acc = forms.BooleanField(initial=True, required=False)
+    bot = forms.ChoiceField(choices=[(str(i.bot_uuid), i.name) for i in Bots.objects.all()])
+
+    def clean_level_access(self):
+        level = self.cleaned_data["level_access"]
+        return int(level)
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if " " in username:
+            raise ValidationError("username cant containe space.")
+        if User.objects.filter(username=username).exists():
+            raise ValidationError("username already exists")
+        return username

@@ -130,10 +130,6 @@ class ListConfigsView(LoginRequiredMixin, View):
         return render(request, "sellers_list_configs.html",
                       {"list_configs": list_configs, "searched": searched, "userid": userid})
 
-class sellers_info(LoginRequiredMixin, View):
-    def get(self, request):
-        user_obj = User.objects.all()
-        return render(request, "sellers_info.html", {"user_obj": user_obj})
 # get prices api _______________________________________________
 
 class ApiGetConfigTimeChoices(APIView):

@@ -94,13 +94,13 @@
                     <input class="input_btn submit_btn" type="submit" value="🔍">
                 </form>
             </div>
-           {% if user.level_access == 0 %}
-                <a href="{% url "sellers_config:create_config" user.id %}" class="links link2">➕ ساخت کانفیگ 🔗</a>
-                <a href="{% url "sellers_config:list_configs" user.id %}" class="links link2">📋 لیست کانفیگ ها 🔗</a>
-            {% else %}
-                <button class="links link2" id="create_config">➕ ساخت کانفیگ 🔗</button>
-                <button class="links link2" id="list_config">📋 لیست کانفیگ ها 🔗</button>
-            {% endif %}
+        {% if user.level_access == 0 %}
+            <a href="{% url "sellers_config:create_config" user.id %}" class="links link2">➕ ساخت کانفیگ 🔗</a>
+            <a href="{% url "sellers_config:list_configs" user.id %}" class="links link2">📋 لیست کانفیگ ها 🔗</a>
+        {% else %}
+            <button class="links link2" id="create_config">➕ ساخت کانفیگ 🔗</button>
+            <button class="links link2" id="list_config">📋 لیست کانفیگ ها 🔗</button>
+        {% endif %}
         {% if not user.level_access == 10 %} {# and finance accsess #}
             <a href="{% url "sellers_finance:seller_payment_page" user.id %}" class="links link2" id="customers">💵 صورت حساب 💳</a>
         {% else %}
@@ -113,13 +113,17 @@
             <button id="select_prices" class="links">💰 تعرفه ها 🛒</button>
         {% endif %}
             <a href="" class="links" id="setting">🗃️  Logs 👨🏻‍🔧</a>
-            <a href="{%  %}" class="links" id="setting">👤 فروشنده ها 🛠️</a>
+            <a href="{% url 'accounts:sellers_info' %}" class="links" id="setting">👤 فروشنده ها 🛠️</a>
             <a href="" class="links" id="setting">📶 Status 📑</a>
             {% if not user.level_access == 0 %}
                 <a href="" class="links" id="message">️📝 پیام همگانی 📨</a>
                 <a href="" class="links" id="report">📊 گزارشات 📈</a>
             {% endif %}
+
+        {% if user.level_access == 10 %}
+            <a href="{% url "sellers_connection:list_bots" %}" class="links" id="setting">⚙️ بات های تلگرام 🤖️</a>
             <a href="" class="links" id="setting">⚙️ تنظیمات 🛠️</a>
+        {% endif %}
 
         </div>
     </div>

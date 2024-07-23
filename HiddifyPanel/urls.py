@@ -16,4 +16,5 @@ urlpatterns = [
     path("bot_config/", include("bot_config.urls", namespace="bot_configs")),
     path("sellers_config/", include("sellers_config.urls", namespace="sellers_configs")),
     path("sellers_finance/", include("sellers_finance.urls"), name="sellers_finance"),
+    path("sellers_connection/", include("sellers_connection.urls", namespace="sellers_connection")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,14 +1,18 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 from .managers import UserManager
+from sellers_connection.models import Bots
+
 class User(AbstractBaseUser):
     username = models.CharField(unique=True, max_length=20)
     is_active = models.BooleanField(default=True)
     level_access = models.PositiveIntegerField(default=0, choices=[(0, 'Seller'), (1, 'SubSeller'), (10, 'Admin')])
     payment_limit = models.PositiveIntegerField(default=0)
     finanace_access = models.BooleanField(default=True)
-    create_config = models.BooleanField(default=True)
-    list_configs = models.BooleanField(default=True)
+    create_config_acc = models.BooleanField(default=True)
+    list_configs_acc = models.BooleanField(default=True)
+    delete_config_acc = models.BooleanField(default=True)
+    bot = models.ForeignKey(Bots, on_delete=models.DO_NOTHING,default=1, null=True)
 
     objects = UserManager()
 

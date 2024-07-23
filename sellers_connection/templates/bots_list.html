@@ -1,0 +1,64 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="fa" class="no-js">
+	<head>
+		<title>List Configs</title>
+        {% include "base_head.html" %}
+        <link rel="stylesheet" type="text/css" href="{% static 'component.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'bot_finance/surathesab_page.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'create_form.css' %}"/>
+    </head>
+	<body dir="ltr">
+        {% include "navbar_sellers.html" %}
+        {% include 'messages.html' %}
+        <div id="main" style="flex-direction: column; display:flex;align-items: center">
+
+		    <div class="xcontainer">
+		    		<table class="overflow-y">
+		    			<thead>
+		    				<tr>
+                                <th>name</th>
+                                <th>username</th>
+                                <th>__________ token __________</th>
+                                <th>_____ uuid _____</th>
+
+                            </tr>
+		    			</thead>
+		    			<tbody>
+                        {% for bot in model_obj %}
+		    				<tr>
+                                <td>{{  bot.name }}</td>
+                                <td>{{ bot.bot_usernamr }}</td>
+                                <td>{{ bot.bot_token }}</td>
+                                <td>{{ bot.bot_uuid }}</td>
+                            </tr>
+                        {% endfor %}
+		    			</tbody>
+		    		</table>
+            </div>
+    <form novalidate action="" method="post" dir="rtl">
+            {% for field_errors in form.errors.values %}
+              {% for error in field_errors %}
+                  <p dir="rtl" class="errors">{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+            <h3 id="title">New Bot</h3>
+            {% csrf_token %}
+            <div class="textinput item"><h3 class="item_text">نام بات : </h3>{{ form.name }}</div>
+            <div id="usage" class="textinput item"><h3 class="item_text">یوزرنیم : </h3>{{ form.bot_usernamr }}</div>
+            <div id="time" class="textinput item"><h3 class="item_text"> توکن : </h3>{{ form.bot_token }}</div>
+            <input id="create" type="submit" value="Create" class="submit_btn">
+        </form>
+
+        </div>
+
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+		<script src={% static "js/list.js" %}></script>
+	</body>
+
+{% include "loading.html" %}
+
+</html>

@@ -13,4 +13,7 @@ urlpatterns = [
     path("vpn_apps/", views.VpnAppsPage.as_view(), name='vpn_apps'),
     path("delete_app/<int:ind>/", views.DeleteAppPage.as_view(), name='delete_app'),
     path("add_vpn_app/", views.AddAppPage.as_view(), name='add_vpn_app'),
+    path("selllers_info/", views.sellers_info.as_view(), name='sellers_info'),
+    path("add_seller/", views.AddSellerPage.as_view(), name='add_seller'),
+    path("edit_seller/<seller_id>/", views.EditSellerPage.as_view(), name='edit_seller'),
 ]

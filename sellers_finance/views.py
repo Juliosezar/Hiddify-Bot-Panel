@@ -100,3 +100,7 @@ class SellerPaymentsPage(LoginRequiredMixin, View):
             return redirect("sellers_finance:seller_payment_page", seller_id)
         return render(request, "seller_payment.html", {"seller_id": seller_id, "form": form, "sum_pays": self.sum_pays, "pays_obj":self.pays_obj})
 
+
+
+
+

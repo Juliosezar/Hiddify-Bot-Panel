@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
-from .forms import LoginForm, AddUserForm, VpnAppsForm,ChangeSettingForm
+
+from sellers_connection.models import Bots
+from .forms import LoginForm, AddUserForm, VpnAppsForm, ChangeSettingForm, SellersAccessesForm
 from .models import User
 from bot_customers.forms import SearchUserForm
 from bot_config.forms import SearchConfigForm
@@ -15,6 +17,7 @@ from sellers_finance.models import SubSellrsRelation
 # Create your views here.
 class LoginView(View):
     formclass = LoginForm
+
     def get(self, request):
         form = self.formclass
         return render(request, "log_in.html", {"form": form})
@@ -39,15 +42,16 @@ class LogoutView(LoginRequiredMixin, View):
 
 class RegisterView(LoginRequiredMixin, View):
     form = AddUserForm
+
     def get(self, request):
         form = self.form
-        return render(request,"register_user.html", {"form": form})
+        return render(request, "register_user.html", {"form": form})
 
     def post(self, request):
         form = self.form(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            user = User(username=cd["username"], level_access=0,is_active=True)
+            user = User(username=cd["username"], level_access=0, is_active=True)
             user.set_password(cd["password"])
             user.save()
             return redirect("accounts:home_bot")
@@ -124,6 +128,7 @@ class DeleteAppPage(LoginRequiredMixin, View):
             f.truncate()
             return redirect("accounts:vpn_apps")
 
+
 class AddAppPage(LoginRequiredMixin, View):
     def get(self, request):
         form = VpnAppsForm()
@@ -135,10 +140,77 @@ class AddAppPage(LoginRequiredMixin, View):
             cd = form.cleaned_data
             with open(settings.BASE_DIR / "settings.json", "r+") as f:
                 file = json.load(f)
-                x = {"app_name":cd["app_name"], "download_url":cd["download_url"], "guid" :cd["guid"]}
+                x = {"app_name": cd["app_name"], "download_url": cd["download_url"], "guid": cd["guid"]}
                 file["applicatios"].append(x)
                 f.seek(0)
                 json.dump(file, f, indent=4)
                 f.truncate()
                 return redirect("accounts:vpn_apps")
         return render(request, "add_vpn_app.html", {"form": form})
+
+
+class sellers_info(LoginRequiredMixin, View):
+    def get(self, request):
+        user_obj = User.objects.all()
+        return render(request, "sellers_info.html", {"user_obj": user_obj})
+
+
+class AddSellerPage(LoginRequiredMixin, View):
+    def get(self, request):
+        form = SellersAccessesForm
+        return render(request, "add_seller.html", {"form": form, "edit": False})
+
+    def post(self, request):
+        form = SellersAccessesForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user_obj = User.objects.create(
+                username=cd["username"],
+                level_access=cd["level_access"],
+                payment_limit=cd["payment_limit"] * 1000,
+                finanace_access=cd["finanace_access"],
+                create_config_acc=cd["create_config_acc"],
+                list_configs_acc=cd["list_configs_acc"],
+                delete_config_acc=cd["delete_config_acc"],
+                bot=Bots.objects.get(bot_uuid=cd["bot"])
+            )
+            user_obj.set_password(cd["password"])
+            user_obj.save()
+            return redirect("accounts:sellers_info")
+        return render(request, "add_seller.html", {"form": form, "edit": False})
+
+
+class EditSellerPage(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        self.user = User.objects.get(id=kwargs["seller_id"])
+        self.form = SellersAccessesForm(initial={
+            "username": self.user.username,
+            "level_access": self.user.level_access,
+            "payment_limit": int(self.user.payment_limit / 1000),
+            "finanace_access": self.user.finanace_access,
+            "create_config_acc": self.user.create_config_acc,
+            "list_configs_acc": self.user.list_configs_acc,
+            "delete_config_acc": self.user.delete_config_acc,
+            "bot": self.user.bot
+        })
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, seller_id):
+        return render(request, "add_seller.html", {"form": self.form, "edit": True, "usernamr":self.user.username})
+
+    def post(self, request, seller_id):
+        form = SellersAccessesForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            self.user.level_access = int(cd["level_access"])
+            self.user.payment_limit = cd["payment_limit"] * 1000
+            self.user.finanace_access = cd["finanace_access"]
+            self.user.create_config_acc = cd["create_config_acc"]
+            self.user.list_configs_acc = cd["list_configs_acc"]
+            self.user.delete_config_acc = cd["delete_config_acc"]
+            self.user.bot = Bots.objects.get(bot_uuid=cd["bot"])
+            self.user.save()
+            return redirect("accounts:sellers_info")
+        return render(request, "add_seller.html", {"form": form, "edit": True, "usernamr":self.user.username})
+
+
